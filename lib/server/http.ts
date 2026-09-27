@@ -16,7 +16,7 @@ export function json(data: unknown, status = 200, init?: { headers?: Record<stri
 
 export function errorResponse(e: unknown): NextResponse {
   if (e instanceof HttpError) return json({ error: e.message }, e.status);
-  console.error('[committed] unexpected error', e);
+  console.error('[safespend] unexpected error', e);
   return json({ error: 'Something went wrong on our side. Please try again.' }, 500);
 }
 

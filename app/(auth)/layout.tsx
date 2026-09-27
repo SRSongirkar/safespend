@@ -3,12 +3,12 @@ import Icon from '@/components/Icon';
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="auth-wrap">
-      <section className="auth-brand" aria-label="About Committed">
+      <section className="auth-brand" aria-label="About SafeSpend">
         <div className="brand">
           <span className="brand-mark">
             <Icon name="lock" size={16} strokeWidth={2.4} />
           </span>
-          Committed
+          SafeSpend
         </div>
         <div className="auth-pitch">
           <h1>Your bank balance is not the full story.</h1>
@@ -20,11 +20,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <b>₹88,114</b>
           </div>
           <div>
-            <span>Lowest balance</span>
+            <span>Lowest bank balance</span>
             <b>₹25,000</b>
           </div>
           <div>
-            <span>Safe to spend</span>
+            <span>Safe to spend now</span>
             <b>₹12,500</b>
           </div>
         </div>

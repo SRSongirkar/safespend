@@ -1,8 +1,8 @@
-# Committed
+# SafeSpend
 
 **What's already promised before payday — and can I say yes to this purchase?**
 
-Committed is a private, multi-user personal finance tracker. Each person signs in to their own encrypted space and imports bank, card, payslip and receipt files. It keeps transactions up to date without duplicates, tracks spending month by month, and answers the question bank apps can't: how much of my money is already committed before payday?
+SafeSpend is a private, multi-user personal finance tracker. Each person signs in to their own encrypted space and imports bank, card, payslip and receipt files. It keeps transactions up to date without duplicates, tracks spending month by month, and answers the question bank apps can't: how much of my money is already needed for bills before payday, and how much can I safely spend?
 
 Home shows three numbers — **Already committed**, **Lowest point**, **Safe to spend** — plus a **Can I afford it?** check that returns *Comfortable / Tight / Not without savings* and the exact day things get tight.
 
@@ -60,7 +60,7 @@ Amounts are in Indian rupees (₹). The demo data is generated at an Indian scal
 7. **Correct:** in the ⋯ menu on Netflix, choose **I cancelled this**. The total drops, and an Undo toast appears.
 8. **Multi-user:** sign up a new user. The account is empty, with none of Aisha's data.
 
-A client presentation with screenshots is in `C:\Hackthon\presentation\Committed_Client_Presentation.pptx` (outside this repo).
+A client presentation with screenshots is in `C:\Hackthon\presentation\SafeSpend_Client_Presentation.pptx` (outside this repo).
 
 ---
 
@@ -97,7 +97,7 @@ Pure finance core (no React, no fs, no window)  lib/core/*.ts
 11. **Forecast and afford** (`forecast.ts`, `afford.ts`): daily checking balance to the payday after next. Within a day, outflows apply before income (conservative). Safe to spend = lowest − buffer.
 12. **Spending** (`monthly.ts`) and **insights** (`insights.ts`, at most 4, ranked by money impact).
 
-**Committed vs estimated:** *Already committed* counts only facts: bills, renewals, subscriptions, savings transfers and posted card spending. The everyday spending estimate (last 90 days, top 5% trimmed) is used in the forecast, but it is always labelled and shown hatched, never as committed.
+**Facts vs estimates:** *Bills to pay before payday* counts only facts: bills, renewals, subscriptions, savings transfers and posted card spending. The everyday spending estimate (last 90 days, top 5% trimmed) is used in the forecast, but it is always labelled and shown hatched, never as a bill to pay.
 
 ---
 

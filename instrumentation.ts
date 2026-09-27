@@ -6,10 +6,10 @@ export async function register() {
     try {
       getConfig();
     } catch (e) {
-      console.error(`\n[committed] ${(e as Error).message}\n`);
+      console.error(`\n[safespend] ${(e as Error).message}\n`);
       process.exit(1);
     }
     const { seedDemoIfEmpty } = await import('./lib/server/services/demo');
-    if (await seedDemoIfEmpty()) console.log('[committed] Created demo user aisha@demo.com / demo1234 with demo data.');
+    if (await seedDemoIfEmpty()) console.log('[safespend] Created demo user aisha@demo.com / demo1234 with demo data.');
   }
 }

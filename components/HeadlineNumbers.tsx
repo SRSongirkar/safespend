@@ -69,7 +69,7 @@ export default function HeadlineNumbers({ a, horizon, onHorizon }: { a: Analysis
       <section className="card stat" aria-labelledby="lowest-label">
         <div className="stat-top">
           <h2 id="lowest-label" className="stat-label">
-            Lowest balance
+            Lowest bank balance
           </h2>
           {lowBelowBuffer ? (
             <span className="badge badge-critical">
@@ -83,22 +83,22 @@ export default function HeadlineNumbers({ a, horizon, onHorizon }: { a: Analysis
         </div>
         <div className={`stat-value ${a.lowestPoint.amount < 0 ? 'warn' : ''}`}>{money(a.lowestPoint.amount)}</div>
         <div className="stat-sub">
-          Your bank balance goes down to this on {formatDateDay(a.lowestPoint.date)}
-          {isPaydayMorning ? ', just before your salary comes' : ''}. This already counts your normal daily spending.
+          The least money your bank account will have, on {formatDateDay(a.lowestPoint.date)}
+          {isPaydayMorning ? ', just before your salary comes' : ''} — after paying all bills and normal daily spending.
         </div>
       </section>
 
       <section className="card stat accent" aria-labelledby="safe-label">
         <div className="stat-top">
           <h2 id="safe-label" className="stat-label">
-            Safe to spend
+            Safe to spend now
           </h2>
           <Icon name="shield" size={18} className="faint" />
         </div>
         <div className="stat-value">{money(a.safeToSpend)}</div>
         <div className="stat-sub">
           {a.safeToSpend > 0
-            ? `You can spend this and still keep your minimum balance of ${money(a.bufferCents)} until ${horizonEnd ? formatDate(horizonEnd) : 'your next salary'}.`
+            ? `Extra money you can spend today and still keep ${money(a.bufferCents)} in your account until ${horizonEnd ? formatDate(horizonEnd) : 'your next salary'}.`
             : `Nothing extra right now — your balance already goes down to ${money(a.lowestPoint.amount)} on ${formatDate(a.lowestPoint.date)}.`}
         </div>
       </section>

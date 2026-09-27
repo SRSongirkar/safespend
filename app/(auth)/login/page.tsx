@@ -4,7 +4,7 @@ import AuthForm from '@/components/AuthForm';
 import { getUserFromToken, SESSION_COOKIE } from '@/lib/server/auth';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Sign in — Committed' };
+export const metadata = { title: 'Sign in — SafeSpend' };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const c = await cookies();

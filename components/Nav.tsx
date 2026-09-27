@@ -19,11 +19,11 @@ function isActive(pathname: string, href: string) {
 
 export function BrandLink() {
   return (
-    <Link href="/" className="brand" aria-label="Committed home">
+    <Link href="/" className="brand" aria-label="SafeSpend home">
       <span className="brand-mark">
         <Icon name="lock" size={16} strokeWidth={2.4} />
       </span>
-      Committed
+      SafeSpend
     </Link>
   );
 }

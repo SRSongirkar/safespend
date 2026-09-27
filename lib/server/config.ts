@@ -11,7 +11,7 @@ export function getConfig(): AppConfig {
   const secret = process.env.APP_SECRET;
   if (!secret || secret.length < 32) {
     throw new Error(
-      'APP_SECRET is missing or shorter than 32 characters. Committed refuses to start without it.\n' +
+      'APP_SECRET is missing or shorter than 32 characters. SafeSpend refuses to start without it.\n' +
         'Create one with:\n' +
         `  node -e "console.log('APP_SECRET='+require('crypto').randomBytes(32).toString('hex'))" >> .env.local\n` +
         'then restart the server.',
