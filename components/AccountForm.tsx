@@ -78,10 +78,11 @@ export default function AccountForm({
               Type
             </label>
             <select id={`acct-type-${id}`} className="select" value={type} onChange={(e) => setType(e.target.value as AccountType)}>
-              <option value="checking">Bank account (salary / everyday)</option>
-              <option value="savings">Savings account</option>
+              <option value="checking">Main bank account (salary / everyday spending)</option>
+              <option value="savings">Savings kept aside (extra savings account)</option>
               <option value="card">Credit card</option>
             </select>
+            <span className="hint">Pick “Main bank account” for the account your salary comes into — even if your bank calls it a savings account.</span>
           </div>
         ) : null}
         {type === 'card' ? (

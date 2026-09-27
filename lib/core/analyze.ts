@@ -89,7 +89,11 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
   const currency = settings.currency || 'USD';
   const accounts = vault.accounts;
   const typeOf = new Map<string, AccountType>(accounts.map((a) => [a.id, a.type]));
-  const checkingIds = accounts.filter((a) => a.type === 'checking').map((a) => a.id);
+  // Main (everyday) accounts: checking; if the user has none, their savings accounts — in India the salary account is
+  // usually a savings account. The forecast, salary and bills all run on the main accounts.
+  const checkingOnly = accounts.filter((a) => a.type === 'checking').map((a) => a.id);
+  const checkingIds = checkingOnly.length ? checkingOnly : accounts.filter((a) => a.type === 'savings').map((a) => a.id);
+  const mainSet = new Set(checkingIds);
   const enriched = enrichTransactions(vault);
 
   const latest = enriched.reduce<ISODate | undefined>((m, t) => (!m || t.date > m ? t.date : m), undefined);
@@ -141,7 +145,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
   // ---- balances ----
   const balances = new Map(accounts.map((a) => [a.id, balanceOf(a, txs)]));
   const start = checkingIds.reduce((s, id) => s + (balances.get(id) ?? 0), 0);
-  const savingsBalance = accounts.filter((a) => a.type === 'savings').reduce((s, a) => s + (balances.get(a.id) ?? 0), 0);
+  const savingsBalance = accounts.filter((a) => a.type === 'savings' && !mainSet.has(a.id)).reduce((s, a) => s + (balances.get(a.id) ?? 0), 0);
 
   const nextPayday = income?.nextPayday;
   const followingPayday = income?.followingPayday;
@@ -164,7 +168,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
     const items: UpcomingItem[] = [];
     for (const s of series) {
       if (s.status !== 'active') continue;
-      if (s.accountType === 'savings') continue;
+      if (s.accountType === 'savings' && !mainSet.has(s.accountId)) continue;
       if (s.direction === 'in' && (s.accountType === 'card' || income?.salaryMerchants.has(s.merchant))) continue;
       const sign = s.direction === 'out' ? -1 : 1;
       for (const d of occurrences(s, dayOfMonthFor(s, seriesTxDates.get(s.key) ?? []), end)) {
@@ -293,7 +297,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
     return items.sort((a, b) => (a.date !== b.date ? (a.date < b.date ? -1 : 1) : a.amount - b.amount));
   };
 
-  const isForecastItem = (i: UpcomingItem) => !i.viaCard && typeOf.get(i.accountId) === 'checking';
+  const isForecastItem = (i: UpcomingItem) => !i.viaCard && mainSet.has(i.accountId);
   const toEvents = (items: UpcomingItem[]): ForecastInputEvent[] => {
     const events: ForecastInputEvent[] = [];
     for (const i of items) {
@@ -375,6 +379,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
     insights,
     accounts: accountSummaries,
     historyDays: historyDays(txs, asOf),
+    hasMainAccount: checkingIds.length > 0,
     refs,
     tookMs: 0,
   };

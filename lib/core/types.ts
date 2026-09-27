@@ -321,6 +321,7 @@ export interface AnalysisResult {
   insights: Insight[];
   accounts: AccountSummary[];
   historyDays: number; // days of transaction history available (new users have few)
+  hasMainAccount: boolean; // false when only a credit card has been added
   refs: EvidenceRefs;
   tookMs: number;
 }

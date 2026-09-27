@@ -154,7 +154,18 @@ export default function HomePage() {
         </div>
       </header>
 
-      {a.historyDays < 60 || !a.nextPayday ? (
+      {!a.hasMainAccount ? (
+        <div className="alert alert-error" role="note">
+          <Icon name="alert" size={16} />
+          <div className="spacer">
+            <strong>Please upload your bank account statement.</strong>
+            <div className="small muted">You have added only a credit card. SafeSpend needs your bank account balance to plan your money, so the numbers below show ₹0 for now.</div>
+          </div>
+          <Link href="/import" className="btn btn-sm">
+            <Icon name="upload" size={14} /> Upload
+          </Link>
+        </div>
+      ) : a.historyDays < 60 || !a.nextPayday ? (
         <div className="alert alert-info" role="note">
           <Icon name="info" size={16} />
           <div className="spacer">

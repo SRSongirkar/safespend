@@ -35,4 +35,4 @@ export const CATEGORY_OPTIONS = Object.keys(CATEGORY_LABELS);
 export const categoryLabel = (c: string) => CATEGORY_LABELS[c] ?? c;
 
 export const ACCOUNT_ICONS: Record<string, string> = { checking: 'bank', savings: 'piggy', card: 'card' };
-export const ACCOUNT_LABELS: Record<string, string> = { checking: 'Bank account', savings: 'Savings account', card: 'Credit card' };
+export const ACCOUNT_LABELS: Record<string, string> = { checking: 'Main bank account', savings: 'Savings account', card: 'Credit card' };
