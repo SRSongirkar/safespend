@@ -4,7 +4,7 @@ import type { ImportRecord } from '@/lib/core/types';
 import { formatDateYear, plural } from '@/lib/client/format';
 import Icon from './Icon';
 
-const KIND_LABEL: Record<ImportRecord['kind'], string> = { csv: 'Statement', payslips: 'Payslips', receipts: 'Receipts', receipt_text: 'Pasted email' };
+const KIND_LABEL: Record<ImportRecord['kind'], string> = { csv: 'Statement', payslips: 'Salary slips', receipts: 'Emails', receipt_text: 'Pasted email' };
 
 export default function ImportHistory({ imports, onUndo, empty = 'No imports yet.' }: { imports: ImportRecord[]; onUndo: (r: ImportRecord) => void; empty?: string }) {
   if (imports.length === 0) return <p className="small faint">{empty}</p>;
@@ -19,7 +19,7 @@ export default function ImportHistory({ imports, onUndo, empty = 'No imports yet
             </div>
             <div className="tiny faint">
               {KIND_LABEL[r.kind]} · {formatDateYear(r.createdAt.slice(0, 10))} · {plural(r.added, 'new item')}
-              {r.duplicates ? `, ${r.duplicates} duplicates skipped` : ''}
+              {r.duplicates ? `, ${r.duplicates} already there (skipped)` : ''}
             </div>
           </div>
           {r.added > 0 ? (

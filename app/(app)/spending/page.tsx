@@ -13,15 +13,15 @@ import { formatMoney, formatMonth } from '@/lib/client/format';
 import { useApi } from '@/lib/client/useApi';
 
 function Delta({ now, prev, currency, upIsGood = false }: { now: number; prev: number; currency: string; upIsGood?: boolean }) {
-  if (!prev) return <span className="faint small">No data for the month before</span>;
+  if (!prev) return <span className="faint small">No data for last month</span>;
   const diff = now - prev;
-  if (diff === 0) return <span className="faint small">Same as the month before</span>;
+  if (diff === 0) return <span className="faint small">Same as last month</span>;
   const up = diff > 0;
   const good = up === upIsGood;
   return (
     <span className={`small row ${good ? 'text-good' : 'text-critical'}`} style={{ gap: 4 }}>
       <Icon name={up ? 'arrow_up' : 'arrow_down'} size={13} strokeWidth={2.6} />
-      {formatMoney(Math.abs(diff), currency)} ({Math.round((Math.abs(diff) / prev) * 100)}%) vs the month before
+      {formatMoney(Math.abs(diff), currency)} ({Math.round((Math.abs(diff) / prev) * 100)}%) vs last month
     </span>
   );
 }
@@ -48,11 +48,11 @@ export default function SpendingPage() {
             title="No spending to show yet"
             actions={
               <Link href="/import" className="btn btn-primary">
-                <Icon name="upload" size={16} /> Import a statement
+                <Icon name="upload" size={16} /> Upload a statement
               </Link>
             }
           >
-            Once you import statements you’ll see where your money goes each month, by category.
+            After you upload statements, you will see where your money goes each month.
           </EmptyState>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function SpendingPage() {
       <header className="page-header">
         <div>
           <h1 className="page-title">Spending</h1>
-          <p className="page-sub">Where your money went, by category. Transfers between your accounts and card payments are excluded; card purchases count on the day you made them.</p>
+          <p className="page-sub">Where your money went, by category. Money moved between your own accounts and card bill payments are not counted.</p>
         </div>
         <MonthPicker months={months.map((x) => x.month)} value={m.month} onChange={setSelected} partial={partial} />
       </header>
@@ -80,7 +80,7 @@ export default function SpendingPage() {
         <div className="alert alert-info">
           <Icon name="info" size={16} />
           <span>
-            {formatMonth(m.month, true)} is still in progress — totals run to {asOf}. Compare full months for a fair picture.
+            {formatMonth(m.month, true)} is not over yet — this shows spending up to {asOf}.
           </span>
         </div>
       ) : null}
@@ -92,14 +92,14 @@ export default function SpendingPage() {
           <Delta now={m.totalSpend} prev={m.prevTotalSpend} currency={currency} />
         </section>
         <section className="card stat">
-          <h2 className="stat-label">Income</h2>
+          <h2 className="stat-label">Money in</h2>
           <div className="stat-value">{money(m.income)}</div>
-          <span className="small muted">Salary, interest and other money in</span>
+          <span className="small muted">Salary, interest and other money you received</span>
         </section>
         <section className="card stat">
-          <h2 className="stat-label">Income minus spending</h2>
+          <h2 className="stat-label">Money left</h2>
           <div className={`stat-value ${m.net < 0 ? 'warn' : ''}`}>{formatMoney(m.net, currency, { signed: true })}</div>
-          <span className="small muted">{m.net < 0 ? 'You spent more than came in' : 'Left over this month'}</span>
+          <span className="small muted">{m.net < 0 ? 'You spent more than you earned' : 'Saved this month'}</span>
         </section>
       </div>
 
@@ -123,7 +123,7 @@ export default function SpendingPage() {
                 <h2 id="trend-title" className="card-title">
                   Total spending
                 </h2>
-                <p className="card-sub">Last {trend.length} months · select a month</p>
+                <p className="card-sub">Last {trend.length} months · click a month</p>
               </div>
             </div>
             <BarChart data={trend} selected={m.month} onSelect={setSelected} currency={currency} />
@@ -133,13 +133,13 @@ export default function SpendingPage() {
             <div className="card-header" style={{ marginBottom: 8 }}>
               <div>
                 <h2 id="top-title" className="card-title">
-                  Top merchants
+                  Where you spent most
                 </h2>
                 <p className="card-sub">{formatMonth(m.month, true)}</p>
               </div>
             </div>
             {m.topMerchants.length === 0 ? (
-              <p className="muted small">No merchants this month.</p>
+              <p className="muted small">No spending this month.</p>
             ) : (
               <ol className="evidence-list">
                 {m.topMerchants.map((t, i) => (

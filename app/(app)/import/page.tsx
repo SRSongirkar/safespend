@@ -39,18 +39,18 @@ export default function ImportPage() {
     <div className="page">
       <header className="page-header">
         <div>
-          <h1 className="page-title">Import</h1>
-          <p className="page-sub">Add statements whenever you like. Overlapping files are safe: anything you already imported is skipped.</p>
+          <h1 className="page-title">Upload statements</h1>
+          <p className="page-sub">Add your statements any time. Payments you already added are skipped automatically — no double entries.</p>
         </div>
       </header>
 
       <div className="alert alert-info">
         <Icon name="lock" size={16} />
         <div>
-          <strong>Stored encrypted in your private space. Never shared.</strong>
+          <strong>Your data is private and encrypted. We never share it.</strong>
           <div className="small muted">
-            We keep each transaction’s date, description, amount and balance, plus the payslips and emails you add — not the original file. Nothing is sent to any third party, and
-            you can export or delete everything in Settings.
+            We save the date, details, amount and balance of each payment, and the salary slips and emails you add — not the file itself. Nothing is sent to anyone else, and
+            you can download or delete everything in Settings.
           </div>
         </div>
       </div>
@@ -70,9 +70,9 @@ export default function ImportPage() {
         <div className="card-header">
           <div>
             <h2 id="history-title" className="card-title">
-              Recent imports
+              Recently uploaded
             </h2>
-            <p className="card-sub">Undo removes exactly what an import added.</p>
+            <p className="card-sub">Undo removes only what that upload added.</p>
           </div>
         </div>
         <ImportHistory imports={(imports.data?.imports ?? []).slice(0, 12)} onUndo={setUndoing} />
@@ -81,8 +81,8 @@ export default function ImportPage() {
       {undoing ? (
         <ConfirmDialog
           title={`Undo “${undoing.fileName}”?`}
-          message={`This removes the ${plural(undoing.added, 'item')} this import added.`}
-          confirmLabel="Undo import"
+          message={`This removes the ${plural(undoing.added, 'item')} this upload added.`}
+          confirmLabel="Undo upload"
           busy={busy}
           onConfirm={confirmUndo}
           onClose={() => setUndoing(null)}

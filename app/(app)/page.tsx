@@ -35,7 +35,7 @@ export default function HomePage() {
     async (seriesKey: string) => {
       try {
         await analysisApi.uncorrect(seriesKey);
-        toast({ message: 'Correction undone' });
+        toast({ message: 'Change undone' });
         reload();
       } catch (e) {
         toast({ message: (e as Error).message, kind: 'error' });
@@ -49,10 +49,10 @@ export default function HomePage() {
       try {
         await analysisApi.correct(seriesKey, action, amount);
         const messages = {
-          cancelled: `Removed ${label} from your forecast`,
-          not_recurring: `${label} is no longer treated as recurring`,
-          confirm: `Added ${label} to your forecast`,
-          override_amount: `${label} will now be predicted at ${formatMoney(amount ?? 0, a?.currency, { exact: true })}`,
+          cancelled: `Removed ${label} from your plan`,
+          not_recurring: `${label} is marked as not a regular payment`,
+          confirm: `Added ${label} to your plan`,
+          override_amount: `${label} will now be counted as ${formatMoney(amount ?? 0, a?.currency, { exact: true })}`,
         };
         toast({ message: messages[action], action: { label: 'Undo', onClick: () => void undo(seriesKey) } });
         setOpenItem(null);
@@ -101,7 +101,7 @@ export default function HomePage() {
         <div className="card">
           <EmptyState
             icon="upload"
-            title="Add your first account and import a statement"
+            title="Add your bank account and upload a statement"
             actions={
               <>
                 <button type="button" className="btn btn-primary" onClick={loadDemo} disabled={loadingDemo}>
@@ -109,7 +109,7 @@ export default function HomePage() {
                   Load demo data
                 </button>
                 <Link href="/import" className="btn">
-                  <Icon name="upload" size={16} /> Import a statement
+                  <Icon name="upload" size={16} /> Upload a statement
                 </Link>
                 <Link href="/accounts" className="btn btn-ghost">
                   Add an account
@@ -117,7 +117,7 @@ export default function HomePage() {
               </>
             }
           >
-            Committed reads bank, card, payslip and receipt files and shows how much of your money is already promised before payday. Everything stays encrypted in your private space.
+            Upload your bank statements, card statements, salary slips or bill emails. We show which bills you must pay before your next salary, and how much you can safely spend. Your data stays private and encrypted.
           </EmptyState>
         </div>
       </div>
@@ -130,13 +130,13 @@ export default function HomePage() {
     <div className={`page ${loading ? 'refetching' : ''}`}>
       <header className="page-header">
         <div>
-          <div className="eyebrow">As of {formatDate(a.now)} · latest statement data</div>
+          <div className="eyebrow">Based on your statements up to {formatDate(a.now)}</div>
           <h1 className="page-title">{formatDateLong(a.now)}</h1>
           <p className="hero-note" style={{ marginTop: 6 }}>
             <span>
-              Your bank balance says <strong>{formatMoney(a.startBalance, a.currency)}</strong>.
+              Your bank shows <strong>{formatMoney(a.startBalance, a.currency)}</strong>.
             </span>
-            <span>Here’s what’s actually yours to spend.</span>
+            <span>But part of it is already needed for bills.</span>
           </p>
         </div>
         <div className="row-wrap">
@@ -147,7 +147,7 @@ export default function HomePage() {
           ) : null}
           {a.nextPayday ? (
             <span className="chip">
-              <Icon name="calendar" size={13} /> Payday {formatDate(a.nextPayday)}
+              <Icon name="calendar" size={13} /> Salary on {formatDate(a.nextPayday)}
               {a.payAmount ? ` · ${formatMoney(a.payAmount, a.currency)}` : ''}
             </span>
           ) : null}
@@ -162,11 +162,11 @@ export default function HomePage() {
             <div className="card-header">
               <div>
                 <h2 id="chart-title" className="card-title">
-                  Projected checking balance
+                  Your bank balance, day by day
                 </h2>
                 <p className="card-sub">
-                  Daily through {a.followingPayday ? `your ${formatDate(a.followingPayday)} payday` : formatDate(a.forecast[a.forecast.length - 1].date)} · includes an everyday
-                  spending estimate of {formatMoney(a.everydayDailyEstimate, a.currency)}/day
+                  From today until {a.followingPayday ? `salary day on ${formatDate(a.followingPayday)}` : formatDate(a.forecast[a.forecast.length - 1].date)}. Includes about{' '}
+                  {formatMoney(a.everydayDailyEstimate, a.currency)} a day for normal spending.
                 </p>
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function HomePage() {
             </>
           }
         >
-          <p className="muted small">Future {amountEdit.item.label} payments will be predicted at this amount.</p>
+          <p className="muted small">We will use this amount for future {amountEdit.item.label} payments.</p>
           <div className="input-affix">
             <span>{currencySymbol(a.currency)}</span>
             <input

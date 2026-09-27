@@ -41,7 +41,7 @@ export default function AccountsPage() {
     setBusy(true);
     try {
       await accountsApi.remove(deleting.id);
-      toast({ message: `Deleted ${deleting.name} and its transactions` });
+      toast({ message: `Deleted ${deleting.name} and its payments` });
       setDeleting(null);
       reloadAll();
     } catch (e) {
@@ -89,11 +89,11 @@ export default function AccountsPage() {
       <header className="page-header">
         <div>
           <h1 className="page-title">Accounts</h1>
-          <p className="page-sub">Your bank accounts and cards. Card settings tell Committed when each bill is due and which account pays it.</p>
+          <p className="page-sub">Your bank accounts and credit cards. For a card, add the bill dates so we can plan the bill.</p>
         </div>
         <div className="row-wrap">
           <Link href="/import" className="btn">
-            <Icon name="upload" size={16} /> Import
+            <Icon name="upload" size={16} /> Upload
           </Link>
           <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>
             <Icon name="plus" size={16} /> Add account
@@ -138,7 +138,7 @@ export default function AccountsPage() {
               </>
             }
           >
-            Add your checking, savings and card accounts, then import their statements.
+            Add your bank, savings and credit card accounts, then upload their statements.
           </EmptyState>
         </div>
       ) : null}
@@ -190,22 +190,22 @@ export default function AccountsPage() {
               ) : (
                 <>
                   <div>
-                    <div className="small faint">{acct.type === 'card' ? 'Balance owed' : 'Balance'}</div>
+                    <div className="small faint">{acct.type === 'card' ? 'You owe' : 'Balance'}</div>
                     <div className="account-balance">
                       {s?.balance === null || s?.balance === undefined ? '—' : formatMoney(acct.type === 'card' ? -s.balance : s.balance, currency, { exact: true })}
                     </div>
                     <div className="small muted">
-                      {s?.txCount ? `${plural(s.txCount, 'transaction')} · latest ${formatDateYear(s.lastDate!)}` : 'No transactions yet'}
+                      {s?.txCount ? `${plural(s.txCount, 'payment')} · last on ${formatDateYear(s.lastDate!)}` : 'No payments yet'}
                     </div>
                   </div>
                   {acct.type === 'card' ? (
                     <dl className="kv">
-                      <dt>Statement closes</dt>
-                      <dd>{acct.statementCloseDay ? `day ${acct.statementCloseDay}` : <span className="text-critical">not set</span>}</dd>
-                      <dt>Payment due</dt>
-                      <dd>{acct.dueDay ? `day ${acct.dueDay}` : <span className="text-critical">not set</span>}</dd>
-                      <dt>Autopay from</dt>
-                      <dd>{payFrom?.name ?? 'first checking account'}</dd>
+                      <dt>Bill is made on</dt>
+                      <dd>{acct.statementCloseDay ? `day ${acct.statementCloseDay} of the month` : <span className="text-critical">not set</span>}</dd>
+                      <dt>Pay by</dt>
+                      <dd>{acct.dueDay ? `day ${acct.dueDay} of the month` : <span className="text-critical">not set</span>}</dd>
+                      <dt>Paid from</dt>
+                      <dd>{payFrom?.name ?? 'your main bank account'}</dd>
                       {bill?.due ? (
                         <>
                           <dt>Current bill</dt>
@@ -219,14 +219,14 @@ export default function AccountsPage() {
                   {acct.type === 'card' && (!acct.statementCloseDay || !acct.dueDay) ? (
                     <div className="alert">
                       <Icon name="info" size={16} />
-                      <span className="small">Set the statement and due days so card spending shows up as an upcoming bill.</span>
+                      <span className="small">Add the bill dates so your card spending shows up as a bill to pay.</span>
                     </div>
                   ) : null}
                   <div>
                     <h3 className="card-section-title" style={{ marginTop: 4 }}>
-                      Import history
+                      Uploaded files
                     </h3>
-                    <ImportHistory imports={own.slice(0, 6)} onUndo={setUndoing} empty="No statements imported for this account." />
+                    <ImportHistory imports={own.slice(0, 6)} onUndo={setUndoing} empty="No files uploaded for this account yet." />
                   </div>
                 </>
               )}
@@ -240,9 +240,9 @@ export default function AccountsPage() {
           <div className="card-header">
             <div>
               <h2 id="docs-title" className="card-title">
-                Payslips & receipts
+                Salary slips & emails
               </h2>
-              <p className="card-sub">Documents that aren’t tied to one account.</p>
+              <p className="card-sub">Files that are not linked to one account.</p>
             </div>
           </div>
           <ImportHistory imports={docs} onUndo={setUndoing} />
@@ -252,7 +252,7 @@ export default function AccountsPage() {
       {deleting ? (
         <ConfirmDialog
           title={`Delete ${deleting.name}?`}
-          message={`This removes the account and all ${summary.get(deleting.id)?.txCount ?? 0} of its transactions from your private space. This can’t be undone.`}
+          message={`This deletes the account and all ${summary.get(deleting.id)?.txCount ?? 0} of its payments. You cannot undo this.`}
           confirmLabel="Delete account"
           danger
           busy={busy}
@@ -263,8 +263,8 @@ export default function AccountsPage() {
       {undoing ? (
         <ConfirmDialog
           title={`Undo “${undoing.fileName}”?`}
-          message={`This removes exactly the ${plural(undoing.added, 'item')} this import added. Everything else stays.`}
-          confirmLabel="Undo import"
+          message={`This removes only the ${plural(undoing.added, 'item')} this upload added. Everything else stays.`}
+          confirmLabel="Undo upload"
           busy={busy}
           onConfirm={confirmUndo}
           onClose={() => setUndoing(null)}

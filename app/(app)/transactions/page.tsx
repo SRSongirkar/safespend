@@ -67,7 +67,7 @@ export default function TransactionsPage() {
             onClick: async () => {
               try {
                 const r = await txApi.patch(tx.id, { categoryOverride: next, applyToMerchant: true });
-                toast({ message: `Updated ${plural(r.updated, 'transaction')} from ${tx.merchant}. New ones will follow this rule.` });
+                toast({ message: `Updated ${plural(r.updated, 'payment')} from ${tx.merchant}. New ones will follow this too.` });
                 list.reload();
               } catch (e) {
                 toast({ message: (e as Error).message, kind: 'error' });
@@ -75,7 +75,7 @@ export default function TransactionsPage() {
             },
           },
         });
-      } else toast({ message: 'Category reset to automatic' });
+      } else toast({ message: 'Category will be chosen for you' });
     } catch (e) {
       toast({ message: (e as Error).message, kind: 'error' });
     }
@@ -85,7 +85,7 @@ export default function TransactionsPage() {
     if (!deleting) return;
     try {
       await txApi.remove(deleting.id);
-      toast({ message: 'Cash transaction deleted' });
+      toast({ message: 'Cash payment deleted' });
       setDeleting(null);
       list.reload();
     } catch (e) {
@@ -103,10 +103,10 @@ export default function TransactionsPage() {
       <header className="page-header">
         <div>
           <h1 className="page-title">Transactions</h1>
-          <p className="page-sub">Every imported and cash transaction. Transfers and card payments are matched so they never count as spending.</p>
+          <p className="page-sub">All your payments in one place. Money moved between your own accounts and card bill payments are not counted as spending.</p>
         </div>
         <button type="button" className="btn btn-primary" onClick={() => setAdding(true)} disabled={accountList.length === 0}>
-          <Icon name="plus" size={16} /> Add cash transaction
+          <Icon name="plus" size={16} /> Add cash payment
         </button>
       </header>
 
@@ -117,7 +117,7 @@ export default function TransactionsPage() {
           onCancel={() => setAdding(false)}
           onDone={() => {
             setAdding(false);
-            toast({ message: 'Cash transaction added' });
+            toast({ message: 'Cash payment added' });
             list.reload();
           }}
         />
@@ -170,8 +170,8 @@ export default function TransactionsPage() {
           <select id="f-kind" className="select" value={kind} onChange={(e) => setKind(e.target.value)}>
             <option value="">Everything</option>
             <option value="normal">Spending & income</option>
-            <option value="transfer">Own transfers</option>
-            <option value="card_payment">Card payments</option>
+            <option value="transfer">Between my accounts</option>
+            <option value="card_payment">Card bill payments</option>
           </select>
         </div>
         <div className="field grow">
@@ -218,11 +218,11 @@ export default function TransactionsPage() {
               title="No transactions yet"
               actions={
                 <Link href="/import" className="btn btn-primary">
-                  <Icon name="upload" size={16} /> Import a statement
+                  <Icon name="upload" size={16} /> Upload a statement
                 </Link>
               }
             >
-              Import a bank or card CSV, or add a cash transaction.
+              Upload a bank or card statement, or add a cash payment.
             </EmptyState>
           )
         ) : (
@@ -247,8 +247,8 @@ export default function TransactionsPage() {
 
       {deleting ? (
         <ConfirmDialog
-          title="Delete this cash transaction?"
-          message={`${deleting.merchant} will be removed. Imported transactions can only be removed by undoing their import.`}
+          title="Delete this cash payment?"
+          message={`${deleting.merchant} will be removed. Uploaded payments can only be removed by undoing the upload.`}
           confirmLabel="Delete"
           danger
           onConfirm={confirmDelete}

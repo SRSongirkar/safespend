@@ -166,12 +166,12 @@ describe('API smoke', () => {
     expect(Date.now() - t0).toBeLessThan(1000);
     expect(a.now).toBe('2026-09-24');
     expect(a.nextPayday).toBe('2026-09-30');
-    expect(a.lowestPoint.amount).toBeGreaterThanOrEqual(95000);
-    expect(a.lowestPoint.amount).toBeLessThanOrEqual(105000);
+    expect(a.lowestPoint.amount).toBeGreaterThanOrEqual(2375000);
+    expect(a.lowestPoint.amount).toBeLessThanOrEqual(2625000);
     expect(a.upcoming.filter((u: { merchant: string }) => u.merchant === 'HomeShield')).toHaveLength(1);
 
     const verdict = async (amountCents: number) => (await call(affordPOST, { body: { amountCents, date: '2026-10-02', repeat: 'once' }, cookie })).body.verdict;
-    expect([await verdict(30000), await verdict(60000), await verdict(200000)]).toEqual(['comfortable', 'tight', 'no']);
+    expect([await verdict(750000), await verdict(1500000), await verdict(5000000)]).toEqual(['comfortable', 'tight', 'no']);
     expect((await call(affordPOST, { body: { amountCents: -5, date: 'x' }, cookie })).status).toBe(400);
 
     const spending = await call(spendingGET, { cookie, path: '/api/spending?months=6' });

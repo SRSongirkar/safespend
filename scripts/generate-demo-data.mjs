@@ -8,9 +8,11 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(__dirname, '..', 'public', 'demo');
 
-// Calibrated so the lowest forecast checking balance (as-of → 30 Oct payday) lands in $950–$1,050.
-const OPENING_BALANCE = 1111000; // cents, checking balance before 2025-09-01
-const SAVINGS_OPENING = 600000; // cents
+// Amounts are generated on a base scale, then multiplied by SCALE so the demo reads naturally in rupees (salary ₹1,21,250).
+const SCALE = 25;
+// Calibrated so the lowest forecast checking balance (as-of → 30 Oct payday) lands in ₹23,750–₹26,250 (base $950–$1,050).
+const OPENING_BALANCE = 1111000; // base units (×SCALE → paise), checking balance before 2025-09-01
+const SAVINGS_OPENING = 600000;
 const START = '2025-09-01';
 const AS_OF = '2026-09-24';
 
@@ -152,6 +154,7 @@ for (const p of payments) {
 
 const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
 checking.sort(byDate); // stable: keeps generation order within a day
+for (const list of [checking, savings, card]) for (const t of list) t.amount *= SCALE;
 savings.sort(byDate);
 card.sort(byDate);
 
@@ -160,7 +163,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const write = (name, content) => fs.writeFileSync(path.join(OUT, name), content);
 
 // Checking: format A, DD/MM/YYYY, separate debit/credit, running balance, CRLF
-let bal = OPENING_BALANCE;
+let bal = OPENING_BALANCE * SCALE;
 const checkingRows = checking.map((t) => {
   bal += t.amount;
   return { ...t, balance: bal };
@@ -198,6 +201,7 @@ const aug = [
 ];
 for (let date = '2025-08-02'; aug.length < 20 && date <= '2025-08-31'; date = addDays(date, 1)) everydayChecking(date, aug);
 aug.sort(byDate);
+for (const t of aug) t.amount *= SCALE;
 write(
   'renamed_headers.csv',
   ['When,What,Out,In', ...aug.map((t) => csvLine([dmy(t.date), t.desc, t.amount < 0 ? plain(t.amount) : '', t.amount > 0 ? plain(t.amount) : '']))].join('\n') + '\n',
@@ -209,11 +213,11 @@ write(
   JSON.stringify(
     {
       accounts: [
-        { id: 'chk', name: 'Everyday Checking', type: 'checking' },
-        { id: 'sav', name: 'Savings', type: 'savings', openingBalance: plain(SAVINGS_OPENING) },
-        { id: 'card', name: 'Rewards Card', type: 'card', statementCloseDay: 8, dueDay: 28, autopayFrom: 'chk' },
+        { id: 'chk', name: 'Salary Account', type: 'checking' },
+        { id: 'sav', name: 'Savings Account', type: 'savings', openingBalance: plain(SAVINGS_OPENING * SCALE) },
+        { id: 'card', name: 'Credit Card', type: 'card', statementCloseDay: 8, dueDay: 28, autopayFrom: 'chk' },
       ],
-      settings: { currency: 'USD', buffer: '500.00' },
+      settings: { currency: 'INR', buffer: '12,500.00' },
     },
     null,
     2,
@@ -225,8 +229,8 @@ write(
   'payslips.json',
   JSON.stringify(
     [
-      { employer: 'Acme Design Co', period: '2026-07', payDate: '2026-07-31', gross: '6,500.00', deductions: '1,650.00', net: '4,850.00' },
-      { employer: 'Acme Design Co', period: '2026-08', payDate: '2026-08-31', gross: '6,500.00', deductions: '1,650.00', net: '4,850.00' },
+      { employer: 'Acme Design Co', period: '2026-07', payDate: '2026-07-31', gross: '162,500.00', deductions: '41,250.00', net: '121,250.00' },
+      { employer: 'Acme Design Co', period: '2026-08', payDate: '2026-08-31', gross: '162,500.00', deductions: '41,250.00', net: '121,250.00' },
     ],
     null,
     2,
@@ -242,19 +246,19 @@ write(
         from: 'HomeShield Insurance <billing@homeshield.example>',
         subject: 'Your renters insurance renewal',
         date: '2026-09-10',
-        body: 'Hi Aisha, your renters insurance policy renews on October 3, 2026. Amount: $186.00. It will be charged to your checking account on file.',
+        body: 'Hi Aisha, your renters insurance policy renews on October 3, 2026. Amount: ₹4,650.00. It will be charged to your checking account on file.',
       },
       {
         from: 'Netflix <info@account.netflix.example>',
         subject: 'Your Netflix receipt',
         date: '2026-09-12',
-        body: 'Thanks for your payment of $15.49 for your Standard plan. Next billing date: October 12, 2026.',
+        body: 'Thanks for your payment of ₹387.25 for your Standard plan. Next billing date: October 12, 2026.',
       },
       {
         from: 'Spotify <no-reply@spotify.example>',
         subject: 'An update to your Premium price',
         date: '2026-07-05',
-        body: 'Your Premium price is changing to $11.99 starting August 2026. You don\'t need to do anything.',
+        body: 'Your Premium price is changing to ₹299.75 starting August 2026. You don\'t need to do anything.',
       },
       {
         from: 'Parcel Tracker <track@parcels.example>',
@@ -276,5 +280,5 @@ write(
 
 console.log(
   `Generated demo data: ${checking.length} checking, ${savings.length} savings, ${card.length} card rows. ` +
-    `Checking balance on ${AS_OF}: $${withCommas(bal)}. Card bill due 2026-09-28: $${withCommas(cycleTotal('2026-09-08'))}.`,
+    `Checking balance on ${AS_OF}: ₹${withCommas(bal)}. Card bill due 2026-09-28: ₹${withCommas(cycleTotal('2026-09-08'))}.`,
 );

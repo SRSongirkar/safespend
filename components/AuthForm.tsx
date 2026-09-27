@@ -54,9 +54,9 @@ export default function AuthForm({ mode, next }: { mode: 'login' | 'signup'; nex
   return (
     <div className="auth-card">
       <div>
-        <h2>{mode === 'login' ? 'Welcome back' : 'Create your private space'}</h2>
+        <h2>{mode === 'login' ? 'Welcome back' : 'Create your private account'}</h2>
         <p className="muted" style={{ marginTop: 6 }}>
-          {mode === 'login' ? 'Sign in to see what’s already committed before payday.' : 'Your data is encrypted and visible only to you.'}
+          {mode === 'login' ? 'Sign in to see the bills you must pay before your next salary.' : 'Only you can see your data. It is encrypted.'}
         </p>
       </div>
 

@@ -14,13 +14,13 @@ function mondayOf(iso: string) {
 }
 
 export function evidenceLabel(item: UpcomingItem, a: AnalysisResult): string {
-  if (item.source === 'receipt') return 'From receipt email';
-  if (item.source === 'card_bill') return item.breakdown && item.breakdown.length > 1 ? 'Open statement + estimate' : 'Closed statement';
-  if (item.source === 'payslip') return 'From payslip';
+  if (item.source === 'receipt') return 'Found in your email';
+  if (item.source === 'card_bill') return item.breakdown && item.breakdown.length > 1 ? 'Card spending so far + estimate' : 'From card statement';
+  if (item.source === 'payslip') return 'From salary slip';
   if (item.type === 'income') return 'From bank credits';
   const s = a.series.find((x) => x.key === item.seriesKey);
   const n = s?.count ?? item.evidence.txIds.length;
-  return `Based on ${n} payment${n === 1 ? '' : 's'}${item.evidence.receiptIds.length ? ' + receipt' : ''}`;
+  return `Paid ${n} time${n === 1 ? '' : 's'} before${item.evidence.receiptIds.length ? ' + email' : ''}`;
 }
 
 function RowMenu({ item, onCorrect, onOpen }: { item: UpcomingItem; onCorrect: (r: CorrectionRequest) => void; onOpen: () => void }) {
@@ -58,7 +58,7 @@ function RowMenu({ item, onCorrect, onOpen }: { item: UpcomingItem; onCorrect: (
                 <Icon name="x_circle" size={16} /> I cancelled this
               </button>
               <button type="button" role="menuitem" className="menu-item" onClick={() => pick('not_recurring')}>
-                <Icon name="repeat" size={16} /> Not recurring
+                <Icon name="repeat" size={16} /> Not a regular payment
               </button>
               <button type="button" role="menuitem" className="menu-item" onClick={() => pick('override_amount')}>
                 <Icon name="edit" size={16} /> Change amount…
@@ -102,23 +102,23 @@ export default function UpcomingList({
       <div className="card-header">
         <div>
           <h2 id="upcoming-title" className="card-title">
-            Coming up
+            Upcoming payments
           </h2>
-          <p className="card-sub">Every item is traceable — open one to see what it’s based on.</p>
+          <p className="card-sub">Everything we expect to pay or receive. Click the blue text to see why.</p>
         </div>
         <label className="checkbox small">
           <input type="checkbox" checked={showCard} onChange={(e) => setShowCard(e.target.checked)} />
-          Card charges
+          Show card payments
         </label>
       </div>
-      {items.length === 0 ? <p className="muted">Nothing predicted yet. Import a few months of statements to find your recurring bills.</p> : null}
+      {items.length === 0 ? <p className="muted">Nothing expected yet. Upload a few months of statements so we can find your regular bills.</p> : null}
       {[...groups.entries()].map(([w, list]) => {
         const out = list.filter((i) => i.amount < 0 && !i.viaCard).reduce((s, i) => s - i.amount, 0);
         return (
           <div className="week" key={w}>
             <div className="week-head">
               <span>{weekLabel(w)}</span>
-              {out > 0 ? <span className="num">{formatMoney(out, a.currency)} out of checking</span> : null}
+              {out > 0 ? <span className="num">{formatMoney(out, a.currency)} from bank account</span> : null}
             </div>
             {list.map((item) => {
               const meta = TYPE_META[item.type];
@@ -138,7 +138,7 @@ export default function UpcomingList({
                       <button type="button" className="link-btn small" onClick={() => onOpen(item)}>
                         {evidenceLabel(item, a)}
                       </button>
-                      {item.viaCard ? <span>on {cardName(item.accountId)} · paid via card bill</span> : null}
+                      {item.viaCard ? <span>Paid by {cardName(item.accountId)} (part of the card bill)</span> : null}
                     </div>
                   </div>
                   <div className={`up-amount ${item.amount > 0 ? 'amount-in' : ''}`}>

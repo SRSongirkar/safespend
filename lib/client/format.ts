@@ -7,9 +7,9 @@ function formatter(currency: string, digits: number): Intl.NumberFormat {
   let f = moneyFormatters.get(key);
   if (!f) {
     try {
-      f = new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: digits, maximumFractionDigits: digits });
+      f = new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', { style: 'currency', currency, minimumFractionDigits: digits, maximumFractionDigits: digits });
     } catch {
-      f = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: digits, maximumFractionDigits: digits });
+      f = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: digits, maximumFractionDigits: digits });
     }
     moneyFormatters.set(key, f);
   }
@@ -17,7 +17,7 @@ function formatter(currency: string, digits: number): Intl.NumberFormat {
 }
 
 /** $1,004 (default) · $15.49 (exact) · +$4,850 (signed) */
-export function formatMoney(cents: number, currency = 'USD', opts: { exact?: boolean; signed?: boolean } = {}): string {
+export function formatMoney(cents: number, currency = 'INR', opts: { exact?: boolean; signed?: boolean } = {}): string {
   const digits = opts.exact ? 2 : 0;
   const value = opts.exact ? cents / 100 : Math.round(cents / 100);
   const s = formatter(currency, digits).format(opts.signed ? Math.abs(value) : value);
@@ -25,12 +25,16 @@ export function formatMoney(cents: number, currency = 'USD', opts: { exact?: boo
   return value > 0 ? `+${s}` : value < 0 ? `−${s}` : s;
 }
 
-/** Compact axis labels: $1.2k, $950, −$2k */
-export function formatMoneyCompact(cents: number, currency = 'USD'): string {
+/** Compact axis labels: ₹1.5L, ₹25k, ₹950, −₹2k (L = lakh for INR) */
+export function formatMoneyCompact(cents: number, currency = 'INR'): string {
   const v = cents / 100;
   const abs = Math.abs(v);
   const sign = v < 0 ? '−' : '';
   const symbol = formatter(currency, 0).formatToParts(0).find((p) => p.type === 'currency')?.value ?? '$';
+  if (currency === 'INR' && abs >= 100000) {
+    const l = abs / 100000;
+    return `${sign}${symbol}${Number.isInteger(l) ? l : l.toFixed(1)}L`;
+  }
   if (abs >= 1000) {
     const k = abs / 1000;
     return `${sign}${symbol}${k >= 10 || Number.isInteger(k) ? Math.round(k) : k.toFixed(1)}k`;
@@ -38,7 +42,7 @@ export function formatMoneyCompact(cents: number, currency = 'USD'): string {
   return `${sign}${symbol}${Math.round(abs)}`;
 }
 
-export function currencySymbol(currency = 'USD'): string {
+export function currencySymbol(currency = 'INR'): string {
   return formatter(currency, 0).formatToParts(0).find((p) => p.type === 'currency')?.value ?? '$';
 }
 

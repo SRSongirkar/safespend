@@ -42,7 +42,7 @@ describe('S2 encryption at rest', () => {
     expect((await call(demoPOST, { method: 'POST', cookie })).status).toBe(200);
     const user = listUsers()[0];
     const onDisk = fs.readFileSync(vaultPath(user.id), 'utf8');
-    for (const secret of ['NETFLIX', 'Netflix', 'PAYROLL', 'HomeShield', 'Everyday Checking']) expect(onDisk).not.toContain(secret);
+    for (const secret of ['NETFLIX', 'Netflix', 'PAYROLL', 'HomeShield', 'Salary Account']) expect(onDisk).not.toContain(secret);
     expect(fs.readFileSync(path.join(dataDir, 'users.json'), 'utf8')).not.toContain('password123');
   });
 

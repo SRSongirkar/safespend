@@ -76,9 +76,11 @@ const SUBSCRIPTION_CATEGORIES = new Set(['subscriptions', 'health & fitness']);
 const upcomingType = (s: RecurringSeries): UpcomingType =>
   s.direction === 'in' ? 'income' : s.isTransfer ? 'transfer' : SUBSCRIPTION_CATEGORIES.has(s.category) ? 'subscription' : 'bill';
 
+const CADENCE_WORDS: Record<string, string> = { weekly: 'every week', biweekly: 'every 2 weeks', monthly: 'every month', quarterly: 'every 3 months', yearly: 'every year' };
+
 function describeSeries(s: RecurringSeries, currency: string): string {
-  const amount = s.amountType === 'fixed' ? `fixed ${formatCentsExact(s.predictedAmount, currency)}` : `varies, predicted ${formatCentsExact(s.predictedAmount, currency)} (median of the last 3)`;
-  return `Based on ${s.count} past payments, ${s.cadence}, ${amount}. Last seen ${formatShortDate(s.lastDate)}.`;
+  const amount = s.amountType === 'fixed' ? `always ${formatCentsExact(s.predictedAmount, currency)}` : `amount changes, we expect about ${formatCentsExact(s.predictedAmount, currency)}`;
+  return `Paid ${s.count} times before, ${CADENCE_WORDS[s.cadence]} (${amount}). Last paid on ${formatShortDate(s.lastDate)}.`;
 }
 
 export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): AnalysisBundle {
@@ -169,7 +171,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
         items.push({
           id: `${s.key}|${d}`,
           date: d,
-          label: s.merchant,
+          label: s.isTransfer ? 'Transfer to savings' : s.merchant,
           merchant: s.merchant,
           type: upcomingType(s),
           accountId: s.accountId,
@@ -218,7 +220,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
           txIds: past.slice(-3).map((t) => t.id),
           receiptIds: [r.receiptId],
           payslipIds: [],
-          note: `From a receipt email dated ${formatShortDate(r.date)}${past.length ? `; last paid ${formatShortDate(past[past.length - 1].date)}` : ''}.`,
+          note: `We found this in an email from ${formatShortDate(r.date)}${past.length ? `. You last paid it on ${formatShortDate(past[past.length - 1].date)}` : ''}.`,
         },
       });
     }
@@ -245,19 +247,19 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
           viaCard: false,
           estimatePart: b.estimate,
           breakdown: closed
-            ? [{ label: `Statement ${formatShortDate(addDays(b.cycle.openExclusive, 1))}–${formatShortDate(b.cycle.closeDate)}`, amount: b.actual }]
+            ? [{ label: `Card spending ${formatShortDate(addDays(b.cycle.openExclusive, 1))} – ${formatShortDate(b.cycle.closeDate)}`, amount: b.actual }]
             : [
-                { label: 'Already spent this cycle', amount: b.actual },
-                ...(b.recurring ? [{ label: `Recurring charges before ${formatShortDate(b.cycle.closeDate)}`, amount: b.recurring }] : []),
-                { label: `Everyday spending estimate (${diffDays(asOf > b.cycle.openExclusive ? asOf : b.cycle.openExclusive, b.cycle.closeDate)} days)`, amount: b.estimate, estimate: true },
+                { label: 'Already spent on the card', amount: b.actual },
+                ...(b.recurring ? [{ label: `Regular card payments before ${formatShortDate(b.cycle.closeDate)}`, amount: b.recurring }] : []),
+                { label: `Our guess for other spending (${diffDays(asOf > b.cycle.openExclusive ? asOf : b.cycle.openExclusive, b.cycle.closeDate)} days)`, amount: b.estimate, estimate: true },
               ],
           evidence: {
             txIds: b.txIds,
             receiptIds: [],
             payslipIds: [],
             note: closed
-              ? `The statement that closed ${formatShortDate(b.cycle.closeDate)}: ${b.txIds.length} purchases minus refunds. Paid from ${accounts.find((a) => a.id === payFrom)?.name ?? 'checking'} by autopay.`
-              : `Open cycle closing ${formatShortDate(b.cycle.closeDate)}: purchases so far + predicted recurring card charges + an everyday estimate.`,
+              ? `Your card bill for spending up to ${formatShortDate(b.cycle.closeDate)} (${b.txIds.length} purchases). It is paid automatically from ${accounts.find((a) => a.id === payFrom)?.name ?? 'your bank account'}.`
+              : `This bill is still being made (it closes on ${formatShortDate(b.cycle.closeDate)}): what you spent so far + regular card payments + our guess for the rest.`,
           },
           includes: b.recurringLabels,
           card: { accountId: card.id, open: b.cycle.openExclusive, close: b.cycle.closeDate },
@@ -283,7 +285,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
             txIds: income.bankTxIds,
             receiptIds: [],
             payslipIds: income.payslipIds,
-            note: `Paid on the last working day of the month. Amount from your ${income.source === 'payslip' ? 'latest payslip (net pay), matching the bank credit' : 'latest bank credit'}.`,
+            note: `Your salary comes on the last working day of every month. Amount from your ${income.source === 'payslip' ? 'latest salary slip (take-home pay)' : 'last salary in your bank'}.`,
           },
         });
       }

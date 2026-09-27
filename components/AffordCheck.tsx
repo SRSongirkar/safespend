@@ -7,9 +7,9 @@ import { addDaysISO, currencySymbol, formatDate, formatMoney, parseMoneyInput } 
 import Icon from './Icon';
 
 const VERDICT = {
-  comfortable: { title: 'Comfortable', icon: 'check' },
-  tight: { title: 'Tight', icon: 'alert' },
-  no: { title: 'Not without savings', icon: 'x_circle' },
+  comfortable: { title: 'Yes, you can buy it', icon: 'check' },
+  tight: { title: 'Yes, but money will be tight', icon: 'alert' },
+  no: { title: 'Only if you use savings', icon: 'x_circle' },
 } as const;
 
 export default function AffordCheck({ a, onResult }: { a: AnalysisResult; onResult: (r: AffordResult | null) => void }) {
@@ -30,7 +30,7 @@ export default function AffordCheck({ a, onResult }: { a: AnalysisResult; onResu
     e?.preventDefault();
     const cents = parseMoneyInput(override ?? amount);
     if (!cents || cents <= 0) {
-      setError('Enter an amount, e.g. 600');
+      setError('Enter a price, e.g. 15000');
       return;
     }
     if (!date || date < a.now) {
@@ -57,23 +57,23 @@ export default function AffordCheck({ a, onResult }: { a: AnalysisResult; onResu
 
   const money = (c: number) => formatMoney(c, a.currency);
   const v = result ? VERDICT[result.verdict] : null;
-  const title = result ? (result.verdict === 'no' && !result.coveredBySavings ? 'No — even with savings' : v!.title) : '';
-  const sentence = result ? result.sentence.replace(/^[^:]+:\s*/, '') : '';
+  const title = result ? (result.verdict === 'no' && !result.coveredBySavings ? 'No, you can’t afford it now' : v!.title) : '';
+  const sentence = result ? result.sentence : '';
 
   return (
     <section className="card" aria-labelledby="afford-title">
       <div className="card-header" style={{ marginBottom: 12 }}>
         <div>
           <h2 id="afford-title" className="card-title">
-            Can I afford it?
+            Can I buy this?
           </h2>
-          <p className="card-sub">Checks every bill and card payment before your next paydays.</p>
+          <p className="card-sub">Enter a price and a date. We check it against all your upcoming bills.</p>
         </div>
       </div>
       <form className="afford-form" onSubmit={run} noValidate>
         <div className="field">
           <label className="label" htmlFor="afford-amount">
-            Amount
+            Price
           </label>
           <div className="input-affix">
             <span>{currencySymbol(a.currency)}</span>
@@ -81,7 +81,7 @@ export default function AffordCheck({ a, onResult }: { a: AnalysisResult; onResu
               id="afford-amount"
               className="input"
               inputMode="decimal"
-              placeholder="600"
+              placeholder="15000"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               aria-invalid={!!error && !parseMoneyInput(amount)}
@@ -91,7 +91,7 @@ export default function AffordCheck({ a, onResult }: { a: AnalysisResult; onResu
         </div>
         <div className="field">
           <label className="label" htmlFor="afford-date">
-            Paid on
+            Pay on
           </label>
           <input id="afford-date" className="input" type="date" min={a.now} value={date} onChange={(e) => setDate(e.target.value)} />
         </div>
@@ -101,7 +101,7 @@ export default function AffordCheck({ a, onResult }: { a: AnalysisResult; onResu
           </span>
           <div className="seg" role="group" aria-labelledby="afford-repeat" style={{ alignSelf: 'flex-start' }}>
             <button type="button" aria-pressed={repeat === 'once'} onClick={() => setRepeat('once')}>
-              Just once
+              One time
             </button>
             <button type="button" aria-pressed={repeat === 'monthly'} onClick={() => setRepeat('monthly')}>
               Every month
@@ -109,7 +109,7 @@ export default function AffordCheck({ a, onResult }: { a: AnalysisResult; onResu
           </div>
         </div>
         <div className="span-2 quick-amounts" aria-label="Quick amounts">
-          {[300, 600, 2000].map((q) => (
+          {(a.currency === 'INR' ? [7500, 15000, 50000] : [300, 600, 2000]).map((q) => (
             <button
               key={q}
               type="button"
@@ -150,9 +150,9 @@ export default function AffordCheck({ a, onResult }: { a: AnalysisResult; onResu
             <p className="verdict-text">{sentence.charAt(0).toUpperCase() + sentence.slice(1)}</p>
             <div className="verdict-meta">
               <span>
-                Lowest <strong>{money(result.lowest.amount)}</strong> on {formatDate(result.lowest.date)}
+                Lowest balance <strong>{money(result.lowest.amount)}</strong> on {formatDate(result.lowest.date)}
               </span>
-              {result.firstBelowBuffer ? <span>Below buffer from {formatDate(result.firstBelowBuffer)}</span> : null}
+              {result.firstBelowBuffer ? <span>Below minimum from {formatDate(result.firstBelowBuffer)}</span> : null}
               {result.verdict === 'no' ? <span>Savings {money(result.savingsBalance)}</span> : null}
             </div>
           </div>

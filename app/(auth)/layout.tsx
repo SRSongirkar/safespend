@@ -11,32 +11,32 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           Committed
         </div>
         <div className="auth-pitch">
-          <h1>Your bank balance says one thing. Your commitments say another.</h1>
-          <p>See how much of your money is already promised before payday — rent, the card bill, subscriptions, renewals — and whether you can say yes to that purchase.</p>
+          <h1>Your bank balance is not the full story.</h1>
+          <p>See the bills you must pay before your next salary — rent, credit card bill, subscriptions, renewals — and check if you can afford something new.</p>
         </div>
         <div className="auth-preview" aria-hidden="true">
           <div>
-            <span>Already committed</span>
-            <b>$3,525</b>
+            <span>Bills before payday</span>
+            <b>₹88,114</b>
           </div>
           <div>
-            <span>Lowest point</span>
-            <b>$1,000</b>
+            <span>Lowest balance</span>
+            <b>₹25,000</b>
           </div>
           <div>
             <span>Safe to spend</span>
-            <b>$500</b>
+            <b>₹12,500</b>
           </div>
         </div>
         <div className="auth-trust">
           <span>
-            <Icon name="lock" size={15} /> AES-256 encrypted per user
+            <Icon name="lock" size={15} /> Your data is encrypted
           </span>
           <span>
-            <Icon name="shield" size={15} /> No bank logins, no third parties
+            <Icon name="shield" size={15} /> No bank login, no sharing
           </span>
           <span>
-            <Icon name="download" size={15} /> Export or delete anytime
+            <Icon name="download" size={15} /> Download or delete any time
           </span>
         </div>
       </section>

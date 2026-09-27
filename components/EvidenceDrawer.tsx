@@ -7,7 +7,9 @@ import Icon from './Icon';
 import { TYPE_META } from './meta';
 import type { CorrectionRequest } from './UpcomingList';
 
-const HIGHLIGHT = /(\$\s?[\d,]+\.\d{2}|renews on[^.]*|renewal[^.]*|will be charged[^.]*|next billing date[^.]*)/gi;
+const CADENCE_TEXT: Record<string, string> = { weekly: 'every week', biweekly: 'every 2 weeks', monthly: 'every month', quarterly: 'every 3 months', yearly: 'every year' };
+
+const HIGHLIGHT = /((?:\$|₹|Rs\.?)\s?[\d,]+\.\d{2}|renews on[^.]*|renewal[^.]*|will be charged[^.]*|next billing date[^.]*)/gi;
 
 /** Receipt body with amounts and renewal phrases highlighted (React nodes, never innerHTML). */
 function HighlightedBody({ text }: { text: string }) {
@@ -98,37 +100,37 @@ export default function EvidenceDrawer({
           <dl className="kv">
             <dt>Type</dt>
             <dd>{meta.label}</dd>
-            <dt>Source</dt>
+            <dt>Found from</dt>
             <dd>
               {item.source === 'recurring'
-                ? 'Recurring pattern in your transactions'
+                ? 'Your past payments'
                 : item.source === 'receipt'
-                  ? 'Receipt / renewal email'
+                  ? 'An email'
                   : item.source === 'card_bill'
-                    ? 'Card statement'
+                    ? 'Your card statement'
                     : item.source === 'payslip'
-                      ? 'Payslip'
+                      ? 'Salary slip'
                       : 'Bank credits'}
             </dd>
             {series ? (
               <>
-                <dt>Cadence</dt>
+                <dt>How often</dt>
                 <dd>
-                  {series.cadence}, {series.amountType === 'fixed' ? 'fixed amount' : 'amount varies'}
+                  {CADENCE_TEXT[series.cadence]}, {series.amountType === 'fixed' ? 'same amount' : 'amount changes'}
                 </dd>
-                <dt>History</dt>
+                <dt>Paid before</dt>
                 <dd>
-                  {series.count} payments since {formatDate(series.firstDate)}
+                  {series.count} times since {formatDate(series.firstDate)}
                 </dd>
               </>
             ) : null}
             {item.viaCard ? (
               <>
-                <dt>Paid</dt>
-                <dd>on your card — included in the card bill, not counted twice</dd>
+                <dt>Paid by</dt>
+                <dd>credit card — counted once, inside the card bill</dd>
               </>
             ) : null}
-            <dt>Confidence</dt>
+            <dt>How sure we are</dt>
             <dd>{Math.round(item.confidence * 100)}%</dd>
           </dl>
           <div className="meter" aria-hidden="true">
@@ -138,7 +140,7 @@ export default function EvidenceDrawer({
           {item.breakdown ? (
             <div>
               <h3 className="card-section-title" style={{ marginTop: 0 }}>
-                How the bill is built
+                What is in this bill
               </h3>
               <div className="breakdown">
                 {item.breakdown.map((b) => (
@@ -154,12 +156,12 @@ export default function EvidenceDrawer({
               </div>
               {item.estimatePart ? (
                 <p className="tiny faint" style={{ marginTop: 8 }}>
-                  The hatched part is an estimate from your last 90 days of everyday card spending. It’s in the forecast, but not in “already committed”.
+                  The striped part is our guess, based on your card spending in the last 90 days. We use it in the chart, but we don’t count it in “bills to pay”.
                 </p>
               ) : null}
               {item.includes && item.includes.length > 0 ? (
                 <>
-                  <h3 className="card-section-title">Recurring card charges included</h3>
+                  <h3 className="card-section-title">Regular card payments in this bill</h3>
                   <ul className="evidence-list">
                     {item.includes.map((c, k) => (
                       <li key={k}>
@@ -177,7 +179,7 @@ export default function EvidenceDrawer({
           {receipts.length > 0 ? (
             <div className="stack-sm">
               <h3 className="card-section-title" style={{ marginTop: 0 }}>
-                {receipts.length === 1 ? 'Receipt email' : 'Receipt emails'}
+                {receipts.length === 1 ? 'Email' : 'Emails'}
               </h3>
               {receipts.map((r) => (
                 <ReceiptCard key={r.id} r={r} />
@@ -188,7 +190,7 @@ export default function EvidenceDrawer({
           {payslips.length > 0 ? (
             <div>
               <h3 className="card-section-title" style={{ marginTop: 0 }}>
-                Payslips
+                Salary slips
               </h3>
               <ul className="evidence-list">
                 {payslips.map((p) => (
@@ -196,7 +198,7 @@ export default function EvidenceDrawer({
                     <span className="faint">{formatDate(p.payDate)}</span>
                     <span>
                       {p.employer}
-                      <span className="tiny faint"> · gross {money(p.grossCents, false)}, deductions {money(p.deductionsCents, false)}</span>
+                      <span className="tiny faint"> · before deductions {money(p.grossCents, false)}, deductions {money(p.deductionsCents, false)}</span>
                     </span>
                     <span className="num text-good">{money(p.netCents)}</span>
                   </li>
@@ -208,7 +210,7 @@ export default function EvidenceDrawer({
           {txs.length > 0 ? (
             <div>
               <h3 className="card-section-title" style={{ marginTop: 0 }}>
-                {item.source === 'card_bill' ? `Purchases in this statement (${txs.length})` : 'Past payments'}
+                {item.source === 'card_bill' ? `Purchases in this bill (${txs.length})` : 'Past payments'}
               </h3>
               <ul className="evidence-list">
                 {txs.slice(0, 40).map((t) => (
@@ -228,14 +230,14 @@ export default function EvidenceDrawer({
           {item.seriesKey ? (
             <div>
               <h3 className="card-section-title" style={{ marginTop: 0 }}>
-                Not right?
+                Is this wrong?
               </h3>
               <div className="row-wrap">
                 <button type="button" className="btn btn-sm" onClick={() => onCorrect({ item, action: 'cancelled' })}>
                   <Icon name="x_circle" size={15} /> I cancelled this
                 </button>
                 <button type="button" className="btn btn-sm" onClick={() => onCorrect({ item, action: 'not_recurring' })}>
-                  Not recurring
+                  Not a regular payment
                 </button>
                 <button type="button" className="btn btn-sm" onClick={() => onCorrect({ item, action: 'override_amount' })}>
                   <Icon name="edit" size={15} /> Change amount

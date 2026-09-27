@@ -16,7 +16,7 @@ export default function AppShell({ user, children }: { user: PublicUser; childre
           <div className="sidebar-foot">
             <div className="privacy-note">
               <Icon name="shield" size={15} />
-              <span>Your private space. Encrypted at rest, never shared, no bank logins.</span>
+              <span>Your data is private and encrypted. Never shared. No bank login needed.</span>
             </div>
             <UserMenu user={user} placement="up" />
           </div>

@@ -67,7 +67,7 @@ export function commitImport(userId: string, input: ImportInput): Promise<{ impo
     const plan = planImport(vault, input, { newId: randomUUID, today: today(), importId });
     assertOk(plan);
     if (plan.fatal) throw new HttpError(400, plan.errors[0] ?? 'This file could not be imported');
-    if (plan.needsMapping) throw new HttpError(400, plan.errors[0] ?? 'Map the columns of this file first');
+    if (plan.needsMapping) throw new HttpError(400, plan.errors[0] ?? 'Please match the columns of this file first');
     if (plan.needsAccount) throw new HttpError(400, 'Choose which account this file belongs to');
     vault.transactions.push(...plan.transactions);
     vault.receipts.push(...plan.receipts);

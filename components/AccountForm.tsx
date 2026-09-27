@@ -46,7 +46,7 @@ export default function AccountForm({
     let openingCents: number | null = null;
     if (opening.trim() !== '') {
       const v = Number(opening.replace(/[,\s$]/g, ''));
-      if (!Number.isFinite(v)) return setError('Opening balance must be a number');
+      if (!Number.isFinite(v)) return setError('Starting balance must be a number');
       openingCents = Math.round(v * 100);
     }
     const input: AccountInput = { name: name.trim(), openingBalanceCents: openingCents };
@@ -70,7 +70,7 @@ export default function AccountForm({
           <label className="label" htmlFor={`acct-name-${id}`}>
             Account name
           </label>
-          <input id={`acct-name-${id}`} className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Everyday Checking" autoFocus={!compact} />
+          <input id={`acct-name-${id}`} className="input" value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Salary Account" autoFocus={!compact} />
         </div>
         {!account ? (
           <div className="field">
@@ -78,8 +78,8 @@ export default function AccountForm({
               Type
             </label>
             <select id={`acct-type-${id}`} className="select" value={type} onChange={(e) => setType(e.target.value as AccountType)}>
-              <option value="checking">Checking</option>
-              <option value="savings">Savings</option>
+              <option value="checking">Bank account (salary / everyday)</option>
+              <option value="savings">Savings account</option>
               <option value="card">Credit card</option>
             </select>
           </div>
@@ -88,41 +88,41 @@ export default function AccountForm({
           <>
             <div className="field">
               <label className="label" htmlFor={`acct-close-${id}`}>
-                Statement closes on day
+                Bill is made on day
               </label>
               <input id={`acct-close-${id}`} className="input" inputMode="numeric" value={closeDay} onChange={(e) => setCloseDay(e.target.value.replace(/\D/g, ''))} placeholder="8" maxLength={2} />
             </div>
             <div className="field">
               <label className="label" htmlFor={`acct-due-${id}`}>
-                Payment due on day
+                Pay by day
               </label>
               <input id={`acct-due-${id}`} className="input" inputMode="numeric" value={dueDay} onChange={(e) => setDueDay(e.target.value.replace(/\D/g, ''))} placeholder="28" maxLength={2} />
             </div>
             <div className="field span-2">
               <label className="label" htmlFor={`acct-autopay-${id}`}>
-                Paid automatically from
+                Bill paid from
               </label>
               <select id={`acct-autopay-${id}`} className="select" value={autopay} onChange={(e) => setAutopay(e.target.value)}>
-                <option value="">Not set (assume my first checking account)</option>
+                <option value="">Not set (use my main bank account)</option>
                 {banks.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.name}
                   </option>
                 ))}
               </select>
-              <span className="hint">Used to forecast your card bill: the statement total leaves this account on the due day.</span>
+              <span className="hint">We take the card bill from this account on the due day.</span>
             </div>
           </>
         ) : (
           <div className="field span-2">
             <label className="label" htmlFor={`acct-open-${id}`}>
-              Opening balance <span className="faint">(optional)</span>
+              Starting balance <span className="faint">(optional)</span>
             </label>
             <div className="input-affix">
               <span>{currencySymbol(currency)}</span>
               <input id={`acct-open-${id}`} className="input" inputMode="decimal" value={opening} onChange={(e) => setOpening(e.target.value)} placeholder="0.00" />
             </div>
-            <span className="hint">Only needed when your statement file has no balance column: the balance before the first imported transaction.</span>
+            <span className="hint">Only needed if your statement has no balance column: the balance before the first payment in the file.</span>
           </div>
         )}
       </div>

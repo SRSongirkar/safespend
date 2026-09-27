@@ -5,7 +5,7 @@ import type { Cents, ISODate, Receipt } from './types';
 
 // Regex-only receipt/renewal email parsing (no AI).
 
-const AMOUNT = /\$\s?([\d,]+\.\d{2})/;
+const AMOUNT = /(?:\$|₹|\bRs\.?|\bINR)\s?([\d,]+\.\d{2})/i;
 const RENEWAL_KEYWORD = /(renews on|renewal|will be charged|next billing date)/gi;
 const DATE_PATTERNS: { re: RegExp; build: (m: RegExpExecArray) => ISODate | null }[] = [
   { re: /\b([A-Z][a-z]{2,8})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b/, build: (m) => mk(+m[3], monthFromName(m[1]), +m[2]) },

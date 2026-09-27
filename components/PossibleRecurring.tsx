@@ -18,9 +18,9 @@ export default function PossibleRecurring({
       <div className="card-header" style={{ marginBottom: 10 }}>
         <div>
           <h2 id="possible-title" className="card-title">
-            Possible recurring
+            Are these regular payments?
           </h2>
-          <p className="card-sub">We’re not sure about these. Confirm to add them to your forecast.</p>
+          <p className="card-sub">We are not sure. Tell us, and we will update your plan.</p>
         </div>
       </div>
       <ul className="insights">
@@ -31,14 +31,14 @@ export default function PossibleRecurring({
                 {s.merchant} · {formatMoney(s.predictedAmount, currency, { exact: true })} {s.cadence}
               </div>
               <div className="insight-detail">
-                {s.count} payments, last on {formatDate(s.lastDate)} · {Math.round(s.confidence * 100)}% confident
+                Paid {s.count} times, last on {formatDate(s.lastDate)} · {Math.round(s.confidence * 100)}% sure
               </div>
               <div className="row" style={{ marginTop: 8 }}>
                 <button type="button" className="btn btn-sm btn-primary" onClick={() => onDecide(s, true)}>
-                  Confirm
+                  Yes, regular
                 </button>
                 <button type="button" className="btn btn-sm" onClick={() => onDecide(s, false)}>
-                  Ignore
+                  No
                 </button>
               </div>
             </div>

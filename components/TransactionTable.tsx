@@ -24,7 +24,7 @@ export default function TransactionTable({
         <thead>
           <tr>
             <th>Date</th>
-            <th>Merchant</th>
+            <th>Details</th>
             <th>Category</th>
             <th>Account</th>
             <th className="right">Amount</th>
@@ -44,11 +44,11 @@ export default function TransactionTable({
                     <span className="tx-merchant" title={t.rawDescription}>
                       {t.merchant}
                     </span>
-                    {t.kind === 'transfer' ? <span className="badge badge-accent">Transfer</span> : null}
-                    {t.kind === 'card_payment' ? <span className="badge badge-accent">Card payment</span> : null}
+                    {t.kind === 'transfer' ? <span className="badge badge-accent">Own transfer</span> : null}
+                    {t.kind === 'card_payment' ? <span className="badge badge-accent">Card bill paid</span> : null}
                     {t.seriesKey ? (
-                      <span className="badge" title="Part of a recurring series">
-                        <Icon name="repeat" size={11} strokeWidth={2.4} /> Recurring
+                      <span className="badge" title="A regular payment">
+                        <Icon name="repeat" size={11} strokeWidth={2.4} /> Regular
                       </span>
                     ) : null}
                     {t.source === 'manual' ? <span className="badge">Cash</span> : null}
@@ -60,8 +60,8 @@ export default function TransactionTable({
                 </td>
                 <td className="tx-cell-category">
                   {locked ? (
-                    <span className="small muted" title="Matched automatically so it isn’t counted as spending">
-                      {t.kind === 'transfer' ? 'Own transfer' : 'Card payment'} · not spending
+                    <span className="small muted" title="Found automatically, so it is not counted as spending">
+                      {t.kind === 'transfer' ? 'Between your accounts' : 'Card bill payment'} · not spending
                     </span>
                   ) : (
                     <CategorySelect value={t.category} overridden={!!t.categoryOverride} onChange={(c) => onCategory(t, c)} label={`Category for ${t.merchant}`} />

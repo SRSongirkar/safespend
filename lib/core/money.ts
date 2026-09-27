@@ -66,19 +66,21 @@ export function coefficientOfVariation(values: number[]): number {
   return Math.sqrt(variance) / Math.abs(mean);
 }
 
+export const localeFor = (currency: string) => (currency === 'INR' ? 'en-IN' : 'en-US');
+
 /** Plain formatting for server-side sentences (the client uses Intl with the user's currency). */
-export function formatCents(c: Cents, currency = 'USD'): string {
+export function formatCents(c: Cents, currency = 'INR'): string {
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(Math.round(c / 100));
+    return new Intl.NumberFormat(localeFor(currency), { style: 'currency', currency, maximumFractionDigits: 0 }).format(Math.round(c / 100));
   } catch {
-    return `$${Math.round(c / 100)}`;
+    return `${currency} ${Math.round(c / 100)}`;
   }
 }
 
-export function formatCentsExact(c: Cents, currency = 'USD'): string {
+export function formatCentsExact(c: Cents, currency = 'INR'): string {
   try {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(c / 100);
+    return new Intl.NumberFormat(localeFor(currency), { style: 'currency', currency }).format(c / 100);
   } catch {
-    return `$${(c / 100).toFixed(2)}`;
+    return `${currency} ${(c / 100).toFixed(2)}`;
   }
 }

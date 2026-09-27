@@ -12,12 +12,12 @@ import { settingsApi } from '@/lib/client/api';
 import { currencySymbol, formatDateYear, parseMoneyInput } from '@/lib/client/format';
 import { useApi } from '@/lib/client/useApi';
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'INR', 'CAD', 'AUD', 'NZD', 'SGD', 'JPY', 'CHF', 'SEK', 'AED'];
+const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'CAD', 'AUD', 'NZD', 'SGD', 'JPY', 'CHF', 'SEK', 'AED'];
 
 export default function SettingsPage() {
   const toast = useToast();
   const { data, error, initialLoading, reload, setData } = useApi<{ settings: Settings }>('/api/settings');
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('INR');
   const [buffer, setBuffer] = useState('');
   const [asOf, setAsOf] = useState('');
   const [saving, setSaving] = useState(false);
@@ -43,7 +43,7 @@ export default function SettingsPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const bufferCents = parseMoneyInput(buffer);
-    if (bufferCents === null) return toast({ message: 'Enter a valid safety buffer, e.g. 500', kind: 'error' });
+    if (bufferCents === null) return toast({ message: 'Enter a valid minimum balance, e.g. 12500', kind: 'error' });
     setSaving(true);
     try {
       const r = await settingsApi.patch({ currency, bufferCents, asOfOverride: asOf || null });
@@ -101,9 +101,9 @@ export default function SettingsPage() {
         <form className="card stack" onSubmit={save} aria-labelledby="prefs-title">
           <div>
             <h2 id="prefs-title" className="card-title">
-              Money & forecast
+              Money settings
             </h2>
-            <p className="card-sub">How Committed displays money and decides what “safe” means.</p>
+            <p className="card-sub">How money is shown, and how much you want to keep safe.</p>
           </div>
           <div className="field">
             <label className="label" htmlFor="s-currency">
@@ -116,21 +116,21 @@ export default function SettingsPage() {
                 </option>
               ))}
             </select>
-            <span className="hint">Display only — amounts are never converted.</span>
+            <span className="hint">Only changes how money is shown. Nothing is converted.</span>
           </div>
           <div className="field">
             <label className="label" htmlFor="s-buffer">
-              Safety buffer
+              Minimum balance to keep
             </label>
             <div className="input-affix">
               <span>{currencySymbol(currency)}</span>
               <input id="s-buffer" className="input" inputMode="decimal" value={buffer} onChange={(e) => setBuffer(e.target.value)} />
             </div>
-            <span className="hint">The minimum you want to keep in checking. “Safe to spend” keeps you above it.</span>
+            <span className="hint">We warn you if a purchase takes your bank balance below this.</span>
           </div>
           <div className="field">
             <label className="label" htmlFor="s-asof">
-              As-of date override <span className="faint">(for demos)</span>
+              Show data as of <span className="faint">(for demos)</span>
             </label>
             <div className="row">
               <input id="s-asof" className="input" type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)} />
@@ -142,8 +142,8 @@ export default function SettingsPage() {
             </div>
             <span className="hint">
               {data?.settings.asOfOverride
-                ? `Analysis currently runs as of ${formatDateYear(data.settings.asOfOverride)}.`
-                : 'By default the analysis runs as of your latest transaction date.'}
+                ? `Showing data as of ${formatDateYear(data.settings.asOfOverride)}.`
+                : 'Normally we use the date of your latest payment.'}
             </span>
           </div>
           <div className="row" style={{ justifyContent: 'flex-end' }}>
@@ -160,7 +160,7 @@ export default function SettingsPage() {
               <h2 id="appearance-title" className="card-title">
                 Appearance
               </h2>
-              <p className="card-sub">Stored on this device.</p>
+              <p className="card-sub">Saved on this device.</p>
             </div>
             <div className="seg" role="group" aria-label="Theme" style={{ alignSelf: 'flex-start' }}>
               {(['system', 'light', 'dark'] as const).map((t) => (
@@ -184,7 +184,7 @@ export default function SettingsPage() {
               <h2 id="pw-title" className="card-title">
                 Change password
               </h2>
-              <p className="card-sub">Signs you out everywhere else.</p>
+              <p className="card-sub">You will be signed out on other devices.</p>
             </div>
             <div className="field">
               <label className="label" htmlFor="pw-current">
@@ -225,11 +225,11 @@ export default function SettingsPage() {
             <h2 id="data-title" className="card-title">
               Your data
             </h2>
-            <p className="card-sub">Everything is encrypted at rest with AES-256-GCM and only ever read for your account. No bank logins, no AI services, no third parties.</p>
+            <p className="card-sub">Your data is encrypted (AES-256) and used only for your account. No bank login, no AI, no sharing.</p>
           </div>
           <div className="row-wrap">
             <a className="btn" href="/api/export" download>
-              <Icon name="download" size={16} /> Export my data (JSON)
+              <Icon name="download" size={16} /> Download my data
             </a>
           </div>
         </section>
@@ -239,7 +239,7 @@ export default function SettingsPage() {
             <h2 id="danger-title" className="card-title">
               Delete my account
             </h2>
-            <p className="card-sub">Permanently removes your account, sessions and every transaction, payslip and receipt you imported.</p>
+            <p className="card-sub">Deletes your account and everything you uploaded, for ever.</p>
           </div>
           <div>
             <button type="button" className="btn btn-danger" onClick={() => setDeleteOpen(true)}>
@@ -269,7 +269,7 @@ export default function SettingsPage() {
             </>
           }
         >
-          <p className="muted small">This can’t be undone. Consider exporting your data first. Enter your password to confirm.</p>
+          <p className="muted small">You cannot undo this. You may want to download your data first. Enter your password to confirm.</p>
           <input
             className="input"
             type="password"

@@ -41,18 +41,18 @@ export function affordCheck(model: ForecastModel, req: AffordRequest): AffordRes
 
   let sentence: string;
   if (verdict === 'comfortable') {
-    sentence = `Comfortable: your lowest point would be ${money(lowest.amount)} on ${on}, still above your ${money(buffer)} buffer.`;
+    sentence = `Yes. Even after this, your lowest balance will be ${money(lowest.amount)} on ${on} — still above your minimum balance of ${money(buffer)}.`;
   } else if (verdict === 'tight') {
-    sentence = `Tight: on ${on} you'd have ${money(lowest.amount)}, below your ${money(buffer)} buffer.`;
-    if (firstBelowBuffer && firstBelowBuffer !== lowest.date) sentence += ` You'd drop below it from ${formatShortDate(firstBelowBuffer)}.`;
+    sentence = `You can, but money will be tight. On ${on} you will have only ${money(lowest.amount)}, which is less than your minimum balance of ${money(buffer)}.`;
+    if (firstBelowBuffer && firstBelowBuffer !== lowest.date) sentence += ` It goes below your minimum from ${formatShortDate(firstBelowBuffer)}.`;
   } else if (coveredBySavings) {
-    sentence = `Not without savings: you'd be ${money(-lowest.amount)} overdrawn on ${on}. Moving ${money(-lowest.amount + buffer)} from savings (${money(
+    sentence = `Not from your bank account alone. You will be short by ${money(-lowest.amount)} on ${on}. Move ${money(-lowest.amount + buffer)} from your savings (${money(
       model.savingsBalance,
-    )}) keeps your buffer.`;
+    )}) to stay safe.`;
   } else {
-    sentence = `No: you'd be ${money(-lowest.amount)} overdrawn on ${on}, and your savings (${money(model.savingsBalance)}) won't cover it.`;
+    sentence = `No. You will be short by ${money(-lowest.amount)} on ${on}, and your savings (${money(model.savingsBalance)}) are not enough to cover it.`;
   }
-  if (verdict === 'no' && firstBelowZero && firstBelowZero !== lowest.date) sentence += ` You'd first go below zero on ${formatShortDate(firstBelowZero)}.`;
+  if (verdict === 'no' && firstBelowZero && firstBelowZero !== lowest.date) sentence += ` Your balance goes below zero from ${formatShortDate(firstBelowZero)}.`;
 
   return {
     verdict,

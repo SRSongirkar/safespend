@@ -4,7 +4,7 @@ import { formatCents, formatCentsExact } from './money';
 import { cadenceInfo } from './recurring';
 import type { CardBillInfo, ISODate, Insight, RecurringSeries, UpcomingItem } from './types';
 
-/** "What you didn't know", ranked by money impact, max 4. */
+/** "Things you should know", ranked by money impact, max 4. Written in plain words. */
 export function buildInsights(input: {
   asOf: ISODate;
   currency: string;
@@ -24,10 +24,8 @@ export function buildInsights(input: {
       out.push({
         id: `card_bill|${bill.accountId}`,
         kind: 'card_bill',
-        title: `${bill.accountName} bill of ${money(bill.due.amount)} is due ${formatShortDate(bill.due.dueDate)}`,
-        detail: `Your bank balance doesn't show it yet — it's spending already done on the card in the statement that closed ${formatShortDate(
-          bill.due.closeDate,
-        )}.`,
+        title: `${bill.accountName} bill of ${money(bill.due.amount)} is due on ${formatShortDate(bill.due.dueDate)}`,
+        detail: `Your bank balance doesn’t show this yet. You already spent this money on the card (bill made on ${formatShortDate(bill.due.closeDate)}).`,
         impactCents: bill.due.amount,
       });
     }
@@ -39,7 +37,7 @@ export function buildInsights(input: {
       id: `renewal|${item.id}`,
       kind: 'renewal',
       title: `${item.merchant} renews on ${formatShortDate(item.date)} — ${money(-item.amount)}`,
-      detail: `Found in an email. It isn't on any statement yet, so your bank balance doesn't include it.`,
+      detail: `We found this in your email. It is not in your bank statement yet.`,
       impactCents: -item.amount,
     });
   }
@@ -51,8 +49,8 @@ export function buildInsights(input: {
       out.push({
         id: `price|${s.key}`,
         kind: 'price_change',
-        title: `${s.merchant} went ${up ? 'up' : 'down'} from ${exact(s.priceChange.from)} to ${exact(s.priceChange.to)}`,
-        detail: `Since ${formatShortDate(s.priceChange.date)}. That's ${money(Math.abs(s.priceChange.to - s.priceChange.from) * perYear)} a year ${up ? 'more' : 'less'}.`,
+        title: `${s.merchant} price went ${up ? 'up' : 'down'} from ${exact(s.priceChange.from)} to ${exact(s.priceChange.to)}`,
+        detail: `From ${formatShortDate(s.priceChange.date)}. You will pay ${money(Math.abs(s.priceChange.to - s.priceChange.from) * perYear)} ${up ? 'more' : 'less'} per year.`,
         impactCents: Math.abs(s.priceChange.to - s.priceChange.from) * perYear,
         seriesKey: s.key,
       });
@@ -61,8 +59,8 @@ export function buildInsights(input: {
       out.push({
         id: `stopped|${s.key}`,
         kind: 'stopped',
-        title: `${s.merchant} seems to have stopped`,
-        detail: `Last charge ${exact(s.lastAmount)} on ${formatShortDate(s.lastDate)}. It's no longer in your forecast.`,
+        title: `${s.merchant} payments have stopped`,
+        detail: `Last paid ${exact(s.lastAmount)} on ${formatShortDate(s.lastDate)}. We removed it from your plan.`,
         impactCents: s.lastAmount * perYear,
         seriesKey: s.key,
       });
@@ -72,7 +70,7 @@ export function buildInsights(input: {
         id: `cancelled|${s.key}`,
         kind: 'cancelled',
         title: `You cancelled ${s.merchant}`,
-        detail: `That frees up ${money(s.predictedAmount * perYear)} a year. It's been removed from your forecast.`,
+        detail: `You save ${money(s.predictedAmount * perYear)} a year. We removed it from your plan.`,
         impactCents: s.predictedAmount * perYear,
         seriesKey: s.key,
       });
@@ -84,8 +82,8 @@ export function buildInsights(input: {
     out.push({
       id: 'payday_mismatch',
       kind: 'payday_mismatch',
-      title: `Your last pay was ${exact(m.bankNet)}, not ${exact(m.payslipNet)}`,
-      detail: `Your payslip and the bank credit on ${formatShortDate(m.date)} disagree. We're using the bank amount.`,
+      title: `Your last salary was ${exact(m.bankNet)}, not ${exact(m.payslipNet)}`,
+      detail: `Your salary slip and the bank credit on ${formatShortDate(m.date)} don’t match. We are using the bank amount.`,
       impactCents: Math.abs(m.bankNet - m.payslipNet),
     });
   }

@@ -6,10 +6,10 @@ import Icon from './Icon';
 
 export const NAV_ITEMS = [
   { href: '/', label: 'Home', short: 'Home', icon: 'home' },
-  { href: '/transactions', label: 'Transactions', short: 'Activity', icon: 'list' },
+  { href: '/transactions', label: 'Transactions', short: 'Payments', icon: 'list' },
   { href: '/spending', label: 'Spending', short: 'Spending', icon: 'chart' },
   { href: '/accounts', label: 'Accounts', short: 'Accounts', icon: 'wallet' },
-  { href: '/import', label: 'Import', short: 'Import', icon: 'upload' },
+  { href: '/import', label: 'Upload', short: 'Upload', icon: 'upload' },
   { href: '/settings', label: 'Settings', short: 'Settings', icon: 'settings' },
 ] as const;
 

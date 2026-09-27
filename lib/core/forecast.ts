@@ -22,7 +22,7 @@ export function buildForecast(start: Cents, asOf: ISODate, end: ISODate, events:
   let balance = start;
   for (let d = asOf; d <= end; d = addDays(d, 1)) {
     const evs = (byDate.get(d) ?? []).map(({ date: _date, ...rest }) => rest);
-    if (d > asOf && dailyEstimate > 0) evs.push({ itemId: 'everyday', label: 'Everyday spending (estimate)', amount: -dailyEstimate, estimate: true });
+    if (d > asOf && dailyEstimate > 0) evs.push({ itemId: 'everyday', label: 'Daily spending (estimate)', amount: -dailyEstimate, estimate: true });
     let out = 0;
     let inc = 0;
     for (const e of evs) (e.amount < 0 ? (out += e.amount) : (inc += e.amount));

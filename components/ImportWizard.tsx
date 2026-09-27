@@ -14,22 +14,22 @@ import { useToast } from './Toast';
 const MAX_BYTES = 5 * 1024 * 1024;
 
 const FORMAT_LABEL: Record<string, string> = {
-  A: 'Bank CSV — debit / credit / balance (DD/MM/YYYY)',
-  B: 'Bank CSV — signed amounts (YYYY-MM-DD)',
-  C: 'Card CSV — amount + DR/CR (MM/DD/YYYY)',
-  mapped: 'CSV with your saved column mapping',
-  json: 'JSON document',
+  A: 'Bank statement (money out / money in / balance)',
+  B: 'Bank statement (one amount column)',
+  C: 'Credit card statement',
+  mapped: 'Statement (using your saved column settings)',
+  json: 'Salary slips or emails',
   text: 'Pasted email',
-  unknown: 'Unrecognised CSV',
+  unknown: 'New file type — please match the columns',
 };
 
 const SAMPLES = [
-  { file: 'bank_checking_overlap.csv', label: 'Overlapping checking export', hint: 'shows dedupe' },
-  { file: 'renamed_headers.csv', label: 'CSV with unfamiliar headers', hint: 'shows column mapping' },
-  { file: 'bank_checking.csv', label: 'Checking (format A)' },
-  { file: 'bank_savings.csv', label: 'Savings (format B)' },
-  { file: 'card_rewards.csv', label: 'Card (format C)' },
-  { file: 'payslips.json', label: 'Payslips' },
+  { file: 'bank_checking_overlap.csv', label: 'Same bank statement again', hint: 'no double entries' },
+  { file: 'renamed_headers.csv', label: 'File with different columns', hint: 'column matching' },
+  { file: 'bank_checking.csv', label: 'Bank statement' },
+  { file: 'bank_savings.csv', label: 'Savings statement' },
+  { file: 'card_rewards.csv', label: 'Credit card statement' },
+  { file: 'payslips.json', label: 'Salary slips' },
   { file: 'receipts.json', label: 'Receipt emails' },
 ];
 
@@ -136,7 +136,7 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
     try {
       const r = await importApi.commit(body(e));
       update(e.id, { busy: false, result: r.import, preview: r.preview });
-      toast({ message: `${e.fileName}: ${plural(r.import.added, 'new item')} imported, ${r.import.duplicates} duplicates skipped` });
+      toast({ message: `${e.fileName}: ${plural(r.import.added, 'new item')} added, ${r.import.duplicates} already there` });
       onImported();
     } catch (err) {
       update(e.id, { busy: false, error: (err as Error).message });
@@ -168,8 +168,8 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
         <div className="empty-icon">
           <Icon name="upload" size={24} />
         </div>
-        <strong>Drop statements here, or click to choose</strong>
-        <span className="small muted">Bank or card CSV, payslips.json, receipts.json — several at once is fine. Up to 5 MB each.</span>
+        <strong>Drop your files here, or click to choose</strong>
+        <span className="small muted">Bank or card statements (CSV), salary slips or bill emails (JSON). You can add many files. Max 5 MB each.</span>
         <input
           ref={inputRef}
           type="file"
@@ -185,7 +185,7 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
 
       <div className="row-wrap" style={{ justifyContent: 'space-between' }}>
         <div className="stack-sm" style={{ gap: 6 }}>
-          <span className="small muted">No files handy? Try a sample:</span>
+          <span className="small muted">No files? Try a sample:</span>
           <div className="sample-files">
             {SAMPLES.map((s) => (
               <button key={s.file} type="button" className="btn btn-sm" onClick={() => addSample(s.file)} title={s.file}>
@@ -203,14 +203,14 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
       {showPaste ? (
         <div className="card stack-sm">
           <label className="label" htmlFor="paste-email">
-            Paste a receipt or renewal email
+            Paste a bill or renewal email
           </label>
           <textarea
             id="paste-email"
             className="textarea"
             value={paste}
             onChange={(e) => setPaste(e.target.value)}
-            placeholder={'From: HomeShield <billing@homeshield.example>\nSubject: Your renewal\nDate: 2026-09-10\n\nYour policy renews on October 3, 2026. Amount: $186.00.'}
+            placeholder={'From: HomeShield <billing@homeshield.example>\nSubject: Your renewal\nDate: 2026-09-10\n\nYour policy renews on October 3, 2026. Amount: ₹4,650.00.'}
           />
           <div className="row" style={{ justifyContent: 'flex-end' }}>
             <button
@@ -223,7 +223,7 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
                 setShowPaste(false);
               }}
             >
-              Preview email
+              Check email
             </button>
           </div>
         </div>
@@ -266,7 +266,7 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
               <div className="form-grid">
                 <div className="field">
                   <label className="label" htmlFor={`acct-${e.id}`}>
-                    Account
+                    Which account is this?
                   </label>
                   <select id={`acct-${e.id}`} className="select" value={e.newAccount ? '__new' : e.accountId} onChange={(ev) => setAccount(e, ev.target.value)}>
                     <option value="" disabled>
@@ -284,7 +284,7 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
                   <div className="field">
                     <span className="label">Looks like</span>
                     <span className="small muted" style={{ paddingTop: 10 }}>
-                      a {ACCOUNT_LABELS[p.suggestedAccountType].toLowerCase()} export
+                      a {ACCOUNT_LABELS[p.suggestedAccountType].toLowerCase()} statement
                     </span>
                   </div>
                 ) : null}
@@ -334,17 +334,17 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
                   </div>
                   <div className="count good">
                     <b className="num">{(e.result?.added ?? p.added).toLocaleString('en-US')}</b>
-                    <span>{e.result ? 'imported' : 'new'}</span>
+                    <span>{e.result ? 'added' : 'new'}</span>
                   </div>
                   <div className="count">
                     <b className="num">{p.duplicates.toLocaleString('en-US')}</b>
-                    <span>duplicates skipped</span>
+                    <span>already added (skipped)</span>
                   </div>
                 </div>
                 {p.added === 0 && p.duplicates > 0 && !e.result ? (
                   <div className="alert alert-good">
                     <Icon name="check" size={16} />
-                    <span>Everything in this file is already in your space — importing it again adds nothing.</span>
+                    <span>All of these are already added. Nothing new to add — no double entries.</span>
                   </div>
                 ) : null}
                 {p.errors.length > 0 ? (
@@ -365,7 +365,7 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
                       <thead>
                         <tr>
                           <th>Date</th>
-                          <th>Description</th>
+                          <th>Details</th>
                           {p.kind === 'csv' || p.kind === 'payslips' ? <th className="right">Amount</th> : null}
                           <th />
                         </tr>
@@ -376,7 +376,7 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
                             <td className="nowrap">{formatDateYear(s.date)}</td>
                             <td className="small">{s.description}</td>
                             {p.kind === 'csv' || p.kind === 'payslips' ? <td className="num">{formatMoney(s.amount, currency, { exact: true, signed: true })}</td> : null}
-                            <td className="right">{s.duplicate ? <span className="badge">Duplicate</span> : <span className="badge badge-good">New</span>}</td>
+                            <td className="right">{s.duplicate ? <span className="badge">Already added</span> : <span className="badge badge-good">New</span>}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -387,18 +387,18 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
                   <div className="alert alert-good">
                     <Icon name="check" size={16} />
                     <span className="spacer">
-                      Imported {plural(e.result.added, 'new item')}
-                      {e.result.duplicates ? `, skipped ${e.result.duplicates} duplicates` : ''}.
+                      Added {plural(e.result.added, 'new item')}
+                      {e.result.duplicates ? `, skipped ${e.result.duplicates} already added` : ''}.
                     </span>
                     <Link href="/" className="btn btn-sm">
-                      See my forecast
+                      See my plan
                     </Link>
                   </div>
                 ) : (
                   <div className="row" style={{ justifyContent: 'flex-end' }}>
                     <button type="button" className="btn btn-primary" disabled={e.busy || p.added === 0} onClick={() => commit(e)}>
                       {e.busy ? <span className="spinner" /> : <Icon name="check" size={16} />}
-                      {p.added === 0 ? 'Nothing new to import' : `Import ${plural(p.added, 'new item')}`}
+                      {p.added === 0 ? 'Nothing new to add' : `Add ${plural(p.added, 'new item')}`}
                     </button>
                   </div>
                 )}
@@ -418,7 +418,7 @@ export default function ImportWizard({ accounts, currency, onAccountsChanged, on
               for (const e of ready) await commit(e);
             }}
           >
-            Import all {ready.length} files
+            Add all {ready.length} files
           </button>
         </div>
       ) : null}

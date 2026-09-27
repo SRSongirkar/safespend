@@ -74,8 +74,8 @@ export default function ColumnMapper({ header, text, onApply, busy }: { header: 
   return (
     <div className="mapper" role="group" aria-label="Map columns">
       <div className="span-3">
-        <strong>We don’t recognise these columns yet.</strong>
-        <p className="small muted">Tell us which column is which. We’ll remember it for files with the same headers.</p>
+        <strong>We don’t know these columns yet.</strong>
+        <p className="small muted">Tell us which column is which. We will remember it next time.</p>
       </div>
       {col('Date column', dateCol, setDateCol, 'map-date')}
       <div className="field">
@@ -88,12 +88,12 @@ export default function ColumnMapper({ header, text, onApply, busy }: { header: 
           <option value="YYYY-MM-DD">YYYY-MM-DD (2026-09-24)</option>
         </select>
       </div>
-      {col('Description column', descCol, setDescCol, 'map-desc')}
+      {col('Details column', descCol, setDescCol, 'map-desc')}
       <div className="field span-3">
         <span className="label">Amounts</span>
         <div className="seg" role="group" aria-label="Amount columns" style={{ alignSelf: 'flex-start' }}>
           <button type="button" aria-pressed={mode === 'split'} onClick={() => setMode('split')}>
-            Money out + money in columns
+            Separate money out / money in columns
           </button>
           <button type="button" aria-pressed={mode === 'single'} onClick={() => setMode('single')}>
             One amount column
@@ -105,11 +105,11 @@ export default function ColumnMapper({ header, text, onApply, busy }: { header: 
           {col('Amount column', amountCol, setAmountCol, 'map-amount')}
           <div className="field">
             <label className="label" htmlFor="map-sign">
-              Sign
+              Minus means
             </label>
             <select id="map-sign" className="select" value={amountSign} onChange={(e) => setAmountSign(e.target.value as typeof amountSign)}>
-              <option value="negative_is_out">Negative = money out</option>
-              <option value="positive_is_out">Positive = money out</option>
+              <option value="negative_is_out">Minus (−) = money out</option>
+              <option value="positive_is_out">Plus = money out</option>
             </select>
           </div>
         </>
@@ -123,7 +123,7 @@ export default function ColumnMapper({ header, text, onApply, busy }: { header: 
       <div className="span-3 row" style={{ justifyContent: 'flex-end' }}>
         <button type="button" className="btn btn-primary" onClick={apply} disabled={busy}>
           {busy ? <span className="spinner" /> : null}
-          Apply mapping
+          Use these columns
         </button>
       </div>
     </div>

@@ -35,7 +35,7 @@ export default function CategorySelect({
         </option>
       ))}
       {!EDITABLE.includes(value) ? <option value={value}>{CATEGORY_LABELS[value] ?? value}</option> : null}
-      {overridden ? <option value="__auto">↺ Automatic</option> : null}
+      {overridden ? <option value="__auto">↺ Choose for me</option> : null}
     </select>
   );
 }

@@ -89,8 +89,9 @@ export default function BalanceChart({ days, overlay, bufferCents, currency, ove
   const overlayLowIdx = overlay ? lowest(overlay) : -1;
   const money = (c: number) => formatMoney(c, currency);
 
+  const bigThreshold = Math.max(10000, Math.round(Math.max(...days.map((d) => d.balance)) / 40));
   const bigEvents = days
-    .map((d, i) => ({ i, d, out: d.events.filter((e) => !e.estimate && e.amount <= -10000) }))
+    .map((d, i) => ({ i, d, out: d.events.filter((e) => !e.estimate && e.amount <= -bigThreshold) }))
     .filter((e) => e.out.length > 0 && e.i !== lowIdx);
 
   const onMove = (e: React.PointerEvent<SVGSVGElement>) => {
@@ -135,8 +136,8 @@ export default function BalanceChart({ days, overlay, bufferCents, currency, ove
     <div>
       <div ref={wrapRef} className="chart">
         <p id={summaryId} className="sr-only">
-          Projected checking balance from {formatDate(days[0].date)} to {formatDate(days[days.length - 1].date)}. Lowest point {money(days[lowIdx].low)} on{' '}
-          {formatDate(days[lowIdx].date)}. Buffer {money(bufferCents)}. Use the arrow keys to move between days.
+          Projected checking balance from {formatDate(days[0].date)} to {formatDate(days[days.length - 1].date)}. Lowest balance {money(days[lowIdx].low)} on{' '}
+          {formatDate(days[lowIdx].date)}. Minimum balance {money(bufferCents)}. Use the arrow keys to move between days.
         </p>
         <svg
           width={width}
@@ -172,7 +173,7 @@ export default function BalanceChart({ days, overlay, bufferCents, currency, ove
           {/* buffer threshold */}
           <line x1={m.l} x2={width - m.r} y1={y(bufferCents)} y2={y(bufferCents)} stroke="var(--ink-3)" strokeWidth={1} strokeDasharray="4 4" />
           <text x={m.l + 6} y={y(bufferCents) - 6} textAnchor="start" className="chart-label">
-            Buffer {money(bufferCents)}
+            Minimum balance {money(bufferCents)}
           </text>
 
           {/* series */}
@@ -214,10 +215,10 @@ export default function BalanceChart({ days, overlay, bufferCents, currency, ove
               <div className="tt-row">
                 <span className="line-key" style={{ background: 'var(--s1)' }} />
                 <strong>{money(mainDay.balance)}</strong>
-                <span>{overlay ? 'Projected' : 'End of day'}</span>
+                <span>{overlay ? 'Without purchase' : 'Balance'}</span>
               </div>
             ) : null}
-            {mainDay && mainDay.low !== mainDay.balance ? <div className="tiny faint">Lowest that day {money(mainDay.low)}, before income lands</div> : null}
+            {mainDay && mainDay.low !== mainDay.balance ? <div className="tiny faint">Lowest that day {money(mainDay.low)} (before salary comes)</div> : null}
             {overlayDay ? (
               <div className="tt-row">
                 <span className="line-key" style={{ background: 'var(--s2)' }} />
@@ -248,17 +249,17 @@ export default function BalanceChart({ days, overlay, bufferCents, currency, ove
         {overlay ? (
           <ul className="legend" style={{ margin: 0 }}>
             <li>
-              <span className="line-key" style={{ background: 'var(--s1)' }} /> Current forecast
+              <span className="line-key" style={{ background: 'var(--s1)' }} /> Without this purchase
             </li>
             <li>
               <span className="line-key" style={{ background: 'var(--s2)' }} /> {overlayLabel}
             </li>
             <li>
-              <span className="line-key dashed" /> Your buffer
+              <span className="line-key dashed" /> Minimum balance
             </li>
           </ul>
         ) : (
-          <span className="tiny faint">Dots mark bills of $100+. Hover or use arrow keys for each day.</span>
+          <span className="tiny faint">Dots show big payments. Point at the chart to see any day.</span>
         )}
         <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowTable((s) => !s)} aria-expanded={showTable}>
           {showTable ? 'Hide table' : 'Show as table'}
@@ -272,9 +273,9 @@ export default function BalanceChart({ days, overlay, bufferCents, currency, ove
               <tr>
                 <th>Date</th>
                 <th className="right">Lowest</th>
-                <th className="right">End of day</th>
+                <th className="right">Balance</th>
                 {overlay ? <th className="right">{overlayLabel}</th> : null}
-                <th>What happens</th>
+                <th>Payments</th>
               </tr>
             </thead>
             <tbody>
@@ -287,7 +288,7 @@ export default function BalanceChart({ days, overlay, bufferCents, currency, ove
                     <td className="num">{main ? money(main.low) : '—'}</td>
                     <td className="num">{main ? money(main.balance) : '—'}</td>
                     {overlay ? <td className="num">{overlay[i] ? money(overlay[i].balance) : '—'}</td> : null}
-                    <td className="small muted">{evs.map((e) => `${e.label} ${formatMoney(e.amount, currency, { signed: true })}`).join(' · ') || 'Everyday spending only'}</td>
+                    <td className="small muted">{evs.map((e) => `${e.label} ${formatMoney(e.amount, currency, { signed: true })}`).join(' · ') || 'Only daily spending'}</td>
                   </tr>
                 );
               })}

@@ -65,6 +65,8 @@ export const MERCHANT_ALIASES: MerchantAlias[] = [
   // money movement
   { pattern: 'VENMO', name: 'Venmo', category: 'other' },
   { pattern: 'ATM', name: 'ATM Withdrawal', category: 'other' },
-  { pattern: 'REWARDS CARD', name: 'Rewards Card Payment', category: 'card payment' },
-  { pattern: 'PAYMENT THANK YOU', name: 'Card Payment', category: 'card payment' },
+  { pattern: 'TRANSFER TO SAV', name: 'Transfer to savings', category: 'transfer' },
+  { pattern: 'TRANSFER FROM CHK', name: 'Transfer from bank account', category: 'transfer' },
+  { pattern: 'REWARDS CARD', name: 'Credit card bill payment', category: 'card payment' },
+  { pattern: 'PAYMENT THANK YOU', name: 'Card bill payment received', category: 'card payment' },
 ];

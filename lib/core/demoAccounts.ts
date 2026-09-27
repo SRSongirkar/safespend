@@ -83,7 +83,7 @@ export function loadDemoIntoVault(vault: UserVault, demo: DemoFiles, ctx: { newI
 export function emptyVault(): UserVault {
   return {
     version: 1,
-    settings: { currency: 'USD', bufferCents: 50000 },
+    settings: { currency: 'INR', bufferCents: 1250000 },
     accounts: [],
     transactions: [],
     receipts: [],

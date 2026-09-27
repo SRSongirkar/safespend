@@ -2,18 +2,18 @@
   "accounts": [
     {
       "id": "chk",
-      "name": "Everyday Checking",
+      "name": "Salary Account",
       "type": "checking"
     },
     {
       "id": "sav",
-      "name": "Savings",
+      "name": "Savings Account",
       "type": "savings",
-      "openingBalance": "6000.00"
+      "openingBalance": "150000.00"
     },
     {
       "id": "card",
-      "name": "Rewards Card",
+      "name": "Credit Card",
       "type": "card",
       "statementCloseDay": 8,
       "dueDay": 28,
@@ -21,7 +21,7 @@
     }
   ],
   "settings": {
-    "currency": "USD",
-    "buffer": "500.00"
+    "currency": "INR",
+    "buffer": "12,500.00"
   }
 }

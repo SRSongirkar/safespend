@@ -21,7 +21,7 @@ export default function ManualTxForm({ accounts, currency, onDone, onCancel }: {
     e.preventDefault();
     const cents = parseMoneyInput(amount);
     if (!accountId) return setError('Add an account first');
-    if (!description.trim()) return setError('Describe the transaction, e.g. “Farmers market”');
+    if (!description.trim()) return setError('Write what it was for, e.g. “Vegetable market”');
     if (!cents) return setError('Enter an amount');
     setBusy(true);
     setError(null);
@@ -40,9 +40,9 @@ export default function ManualTxForm({ accounts, currency, onDone, onCancel }: {
       <div className="card-header" style={{ marginBottom: 0 }}>
         <div>
           <h2 id="manual-title" className="card-title">
-            Add a cash transaction
+            Add a cash payment
           </h2>
-          <p className="card-sub">For spending that isn’t on a statement yet.</p>
+          <p className="card-sub">For spending that is not in any statement yet.</p>
         </div>
         <button type="button" className="btn btn-ghost btn-icon" aria-label="Close" onClick={onCancel}>
           <Icon name="close" size={18} />
@@ -53,7 +53,7 @@ export default function ManualTxForm({ accounts, currency, onDone, onCancel }: {
           <label className="label" htmlFor="mt-desc">
             Description
           </label>
-          <input id="mt-desc" className="input" value={description} onChange={(e) => setDescription(e.target.value)} maxLength={200} placeholder="Farmers market" />
+          <input id="mt-desc" className="input" value={description} onChange={(e) => setDescription(e.target.value)} maxLength={200} placeholder="Vegetable market" />
         </div>
         <div className="field">
           <label className="label" htmlFor="mt-amount">
@@ -62,7 +62,7 @@ export default function ManualTxForm({ accounts, currency, onDone, onCancel }: {
           <div className="row">
             <div className="input-affix spacer">
               <span>{currencySymbol(currency)}</span>
-              <input id="mt-amount" className="input" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="25.00" />
+              <input id="mt-amount" className="input" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="500" />
             </div>
             <div className="seg" role="group" aria-label="Direction">
               <button type="button" aria-pressed={direction === 'out'} onClick={() => setDirection('out')}>
@@ -97,7 +97,7 @@ export default function ManualTxForm({ accounts, currency, onDone, onCancel }: {
             Category <span className="faint">(optional)</span>
           </label>
           <select id="mt-cat" className="select" value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option value="">Detect automatically</option>
+            <option value="">Choose for me</option>
             {Object.entries(CATEGORY_LABELS)
               .filter(([k]) => k !== 'transfer' && k !== 'card payment')
               .map(([k, label]) => (
@@ -119,7 +119,7 @@ export default function ManualTxForm({ accounts, currency, onDone, onCancel }: {
         </button>
         <button type="submit" className="btn btn-primary" disabled={busy}>
           {busy ? <span className="spinner" /> : null}
-          Add transaction
+          Add payment
         </button>
       </div>
     </form>

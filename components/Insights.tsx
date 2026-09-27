@@ -18,13 +18,13 @@ export default function Insights({ insights, onUndo }: { insights: Insight[]; on
       <div className="card-header" style={{ marginBottom: 12 }}>
         <div>
           <h2 id="insights-title" className="card-title">
-            What you might not know
+            Things you should know
           </h2>
-          <p className="card-sub">Ranked by how much money is involved.</p>
+          <p className="card-sub">Most important first.</p>
         </div>
       </div>
       {insights.length === 0 ? (
-        <p className="muted small">No surprises right now. We’ll flag price changes, renewals and stopped subscriptions here.</p>
+        <p className="muted small">Nothing new right now. We will tell you here about price changes, renewals and stopped subscriptions.</p>
       ) : (
         <ul className="insights">
           {insights.map((i) => (

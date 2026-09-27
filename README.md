@@ -35,7 +35,7 @@ The demo user and its data are created automatically on first start if there are
 | `npm run dev` | Development server on port 3000 |
 | `npm run build` / `npm start` | Production build and server |
 | `npm test` | 54 unit, golden and security tests (vitest) |
-| `npm run gen:demo` | Regenerate `public/demo/*` (deterministic, seed 42) |
+| `npm run gen:demo` | Regenerate `public/demo/*` (deterministic, seed 42, amounts in ₹) |
 | `npm run reset` | Delete all stored data (`.data/`). The demo user is re-seeded on the next start |
 
 ### Environment
@@ -49,14 +49,18 @@ The demo user and its data are created automatically on first start if there are
 
 ## 5-minute demo
 
-1. **Sign in** as `aisha@demo.com`. It's Thursday 24 Sep; her bank says **$5,055**.
-2. **The truth:** **$3,525 already committed** before the 30 Sep payday. Almost all of it is the Rewards Card bill due 28 Sep: spending her bank balance doesn't show yet. The **lowest point is $1,000 on 30 Oct**, just before the next salary lands, so **safe to spend is $500** above her buffer.
-3. **Decide:** in *Can I afford it?*, try **$600 on 2 Oct → Tight** (she'd have $400, below the $500 buffer). **$300 → Comfortable**. **$2,000 → Not without savings**, with the amount to move from savings.
-4. **Trust:** open any upcoming item. Rent is based on 13 past payments. The HomeShield renewal on 3 Oct comes from a receipt email, not from any statement. The card bill shows every purchase in the statement. Insights show Spotify's price rise and that Hulu stopped.
-5. **Track:** on **Spending**, pick August for categories vs July, top merchants and a 6-month trend.
-6. **Dedupe:** on **Import**, click the *Overlapping checking export* sample: **0 new, 47 duplicates skipped**. The *unfamiliar headers* sample opens the column mapper.
-7. **Correct:** in the ⋯ menu on Netflix, choose **I cancelled this**. The committed total drops, and an Undo toast appears.
-8. **Multi-user:** sign up a new user. The space is empty, with none of Aisha's data.
+Amounts are in Indian rupees (₹). The demo data is generated at an Indian scale (salary ₹1,21,250 a month).
+
+1. **Sign in** as . It's Thursday 24 Sep, and her bank shows **₹1,26,386**.
+2. **The truth:** **₹88,114 of bills to pay before payday** (30 Sep). Almost all of it is the credit card bill due 28 Sep, which her bank balance doesn't show yet. Her **lowest balance is ₹24,995 on 30 Oct**, just before the next salary, so she is **safe to spend ₹12,495** and still keep her ₹12,500 minimum balance.
+3. **Decide:** in *Can I buy this?*, try **₹15,000 on 2 Oct → Yes, but money will be tight**. **₹7,500 → Yes, you can buy it**. **₹50,000 → Only if you use savings**, with the amount to move from savings.
+4. **Trust:** click the blue text on any upcoming payment. Rent was paid 13 times before. The HomeShield renewal on 3 Oct was found in an email, not in any statement. The card bill lists every purchase. *Things you should know* shows Spotify's price rise and that Hulu stopped.
+5. **Track:** on **Spending**, pick August for categories vs July, where you spent most, and a 6-month trend.
+6. **No double entries:** on **Upload**, click the *Same bank statement again* sample: **0 new, 47 already added**. The *File with different columns* sample opens the column matcher.
+7. **Correct:** in the ⋯ menu on Netflix, choose **I cancelled this**. The total drops, and an Undo toast appears.
+8. **Multi-user:** sign up a new user. The account is empty, with none of Aisha's data.
+
+A client presentation with screenshots is in  (outside this repo).
 
 ---
 

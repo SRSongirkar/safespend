@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Committed — what’s already promised before payday',
-  description: 'A private personal finance tracker that shows how much of your money is already committed before payday, and whether you can afford it.',
+  title: 'Committed — know your bills before payday',
+  description: 'A private money planner that shows the bills you must pay before your next salary, and whether you can afford something new.',
 };
 
 export const viewport: Viewport = {

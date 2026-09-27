@@ -41,8 +41,8 @@ describe('golden', () => {
     expect(byMerchant('Spotify')).toContain('2025-10-03');
   });
 
-  it('G3: rent is monthly, fixed, next 2026-10-01, $1,400', () => {
-    expect(series('Greenview Property Mgmt')).toMatchObject({ cadence: 'monthly', amountType: 'fixed', nextDate: '2026-10-01', predictedAmount: 140000, status: 'active' });
+  it('G3: rent is monthly, fixed, next 2026-10-01, ₹35,000', () => {
+    expect(series('Greenview Property Mgmt')).toMatchObject({ cadence: 'monthly', amountType: 'fixed', nextDate: '2026-10-01', predictedAmount: 3500000, status: 'active' });
   });
 
   it('G4: phone is monthly, variable, predicted = median of the last 3', () => {
@@ -63,11 +63,11 @@ describe('golden', () => {
     expect(bundle.enriched.some((t) => t.merchant === 'Amazon')).toBe(true);
   });
 
-  it('G7: Spotify price-change insight $10.99 → $11.99', () => {
-    expect(series('Spotify')?.priceChange).toMatchObject({ from: 1099, to: 1199 });
-    expect(series('Spotify')?.predictedAmount).toBe(1199);
+  it('G7: Spotify price-change insight ₹274.75 → ₹299.75', () => {
+    expect(series('Spotify')?.priceChange).toMatchObject({ from: 27475, to: 29975 });
+    expect(series('Spotify')?.predictedAmount).toBe(29975);
     const insight = bundle.result.insights.find((i) => i.kind === 'price_change');
-    expect(insight?.title).toContain('Spotify went up from $10.99 to $11.99');
+    expect(insight?.title).toContain('Spotify price went up from ₹274.75 to ₹299.75');
   });
 
   it('G8: Hulu is stopped and absent from upcoming', () => {
@@ -93,7 +93,7 @@ describe('golden', () => {
         'Interest:in',
         'Netflix:out',
         'Spotify:out',
-        'Transfer To Sav:out',
+        'Transfer to savings:out',
         'Verizon:out',
       ].sort(),
     );
@@ -118,10 +118,10 @@ describe('golden', () => {
     }
   });
 
-  it('G11: the insurance renewal 2026-10-03 $186 appears exactly once, from the receipt', () => {
+  it('G11: the insurance renewal 2026-10-03 ₹4,650 appears exactly once, from the receipt', () => {
     const items = bundle.result.upcoming.filter((u) => u.merchant === 'HomeShield');
     expect(items).toHaveLength(1);
-    expect(items[0]).toMatchObject({ date: '2026-10-03', amount: -18600, source: 'receipt' });
+    expect(items[0]).toMatchObject({ date: '2026-10-03', amount: -465000, source: 'receipt' });
     // The Netflix receipt merges into the predicted Netflix charge instead of duplicating it.
     const netflix = bundle.result.upcoming.filter((u) => u.merchant === 'Netflix' && u.date === '2026-10-12');
     expect(netflix).toHaveLength(1);
@@ -143,41 +143,41 @@ describe('golden', () => {
     for (const day of bundle.result.forecast) for (const e of day.events) expect(cardItemIds.has(e.itemId)).toBe(false);
   });
 
-  it('G13: next payday 2026-09-30 (+$4,850), the one after is 2026-10-30', () => {
+  it('G13: next payday 2026-09-30 (+₹1,21,250), the one after is 2026-10-30', () => {
     expect(bundle.result.nextPayday).toBe('2026-09-30');
     expect(bundle.result.followingPayday).toBe('2026-10-30');
-    expect(bundle.result.payAmount).toBe(485000);
+    expect(bundle.result.payAmount).toBe(12125000);
     const pay = bundle.result.upcoming.filter((u) => u.type === 'income').map((u) => [u.date, u.amount]);
     expect(pay).toEqual([
-      ['2026-09-30', 485000],
-      ['2026-10-30', 485000],
+      ['2026-09-30', 12125000],
+      ['2026-10-30', 12125000],
     ]);
   });
 
-  it('G14: the lowest point without extra spend is within $950–$1,050', () => {
-    expect(bundle.result.lowestPoint.amount).toBeGreaterThanOrEqual(95000);
-    expect(bundle.result.lowestPoint.amount).toBeLessThanOrEqual(105000);
-    expect(bundle.result.safeToSpend).toBe(Math.max(0, bundle.result.lowestPoint.amount - 50000));
+  it('G14: the lowest point without extra spend is within ₹23,750–₹26,250', () => {
+    expect(bundle.result.lowestPoint.amount).toBeGreaterThanOrEqual(2375000);
+    expect(bundle.result.lowestPoint.amount).toBeLessThanOrEqual(2625000);
+    expect(bundle.result.safeToSpend).toBe(Math.max(0, bundle.result.lowestPoint.amount - bundle.result.bufferCents));
   });
 
-  it('G15: afford $300 → comfortable, $600 → tight, $2,000 → no (covered by savings)', () => {
+  it('G15: afford ₹7,500 → comfortable, ₹15,000 → tight, ₹50,000 → no (covered by savings)', () => {
     const check = (amountCents: number) => affordCheck(bundle.model, { amountCents, date: '2026-10-02', repeat: 'once' });
-    expect(check(30000).verdict).toBe('comfortable');
-    const tight = check(60000);
+    expect(check(750000).verdict).toBe('comfortable');
+    const tight = check(1500000);
     expect(tight.verdict).toBe('tight');
     expect(tight.firstBelowBuffer).toBeDefined();
-    const no = check(200000);
+    const no = check(5000000);
     expect(no.verdict).toBe('no');
     expect(no.coveredBySavings).toBe(bundle.result.savingsBalance + no.lowest.amount >= 0);
     expect(no.coveredBySavings).toBe(true);
   });
 
-  it('G16: Aug 2026 spending excludes transfers and card payments and includes the $999 Apple Store purchase under shopping', () => {
+  it('G16: Aug 2026 spending excludes transfers and card payments and includes the ₹24,975 Apple Store purchase under shopping', () => {
     const aug = monthlySummaries(bundle.enriched).find((m) => m.month === '2026-08')!;
     const augTx = bundle.enriched.filter((t) => t.date.startsWith('2026-08') && t.kind === 'normal' && t.category !== 'income');
     expect(aug.totalSpend).toBe(-augTx.reduce((s, t) => s + t.amount, 0));
     const shopping = aug.byCategory.find((c) => c.category === 'shopping')!;
-    expect(shopping.amount).toBeGreaterThanOrEqual(99900);
+    expect(shopping.amount).toBeGreaterThanOrEqual(2497500);
     expect(bundle.enriched.find((t) => t.merchant === 'Apple Store')?.category).toBe('shopping');
     expect(aug.topMerchants.map((m) => m.merchant)).toContain('Apple Store');
   });

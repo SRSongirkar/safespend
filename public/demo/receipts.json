@@ -3,19 +3,19 @@
     "from": "HomeShield Insurance <billing@homeshield.example>",
     "subject": "Your renters insurance renewal",
     "date": "2026-09-10",
-    "body": "Hi Aisha, your renters insurance policy renews on October 3, 2026. Amount: $186.00. It will be charged to your checking account on file."
+    "body": "Hi Aisha, your renters insurance policy renews on October 3, 2026. Amount: ₹4,650.00. It will be charged to your checking account on file."
   },
   {
     "from": "Netflix <info@account.netflix.example>",
     "subject": "Your Netflix receipt",
     "date": "2026-09-12",
-    "body": "Thanks for your payment of $15.49 for your Standard plan. Next billing date: October 12, 2026."
+    "body": "Thanks for your payment of ₹387.25 for your Standard plan. Next billing date: October 12, 2026."
   },
   {
     "from": "Spotify <no-reply@spotify.example>",
     "subject": "An update to your Premium price",
     "date": "2026-07-05",
-    "body": "Your Premium price is changing to $11.99 starting August 2026. You don't need to do anything."
+    "body": "Your Premium price is changing to ₹299.75 starting August 2026. You don't need to do anything."
   },
   {
     "from": "Parcel Tracker <track@parcels.example>",

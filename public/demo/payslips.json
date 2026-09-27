@@ -3,16 +3,16 @@
     "employer": "Acme Design Co",
     "period": "2026-07",
     "payDate": "2026-07-31",
-    "gross": "6,500.00",
-    "deductions": "1,650.00",
-    "net": "4,850.00"
+    "gross": "162,500.00",
+    "deductions": "41,250.00",
+    "net": "121,250.00"
   },
   {
     "employer": "Acme Design Co",
     "period": "2026-08",
     "payDate": "2026-08-31",
-    "gross": "6,500.00",
-    "deductions": "1,650.00",
-    "net": "4,850.00"
+    "gross": "162,500.00",
+    "deductions": "41,250.00",
+    "net": "121,250.00"
   }
 ]

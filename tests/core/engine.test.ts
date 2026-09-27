@@ -68,6 +68,8 @@ describe('recurring', () => {
 describe('receipts', () => {
   it('extracts amounts and renewal dates in several formats', () => {
     expect(findAmount('Amount: $186.00.')).toBe(18600);
+    expect(findAmount('Amount: ₹4,650.00.')).toBe(465000);
+    expect(findAmount('Rs. 1,200.00 is due')).toBe(120000);
     expect(findRenewalDate('Your policy renews on October 3, 2026.')).toBe('2026-10-03');
     expect(findRenewalDate('Your renewal is 3 October 2026')).toBe('2026-10-03');
     expect(findRenewalDate('You will be charged on 2026-10-03.')).toBe('2026-10-03');
