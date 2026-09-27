@@ -45,6 +45,16 @@ The demo user and its data are created automatically on first start if there are
 | `APP_SECRET` | yes | — | At least 32 characters. The server refuses to start without it. It derives the vault encryption key. |
 | `DATA_DIR` | no | `.data` | Where users, sessions and encrypted vaults are stored |
 
+### Deploy (Render, free)
+
+The repo includes a  blueprint.
+
+1. Sign in at <https://render.com> with GitHub.
+2. Click **New → Blueprint** and pick the  repo.
+3. Click **Apply**. Render builds and starts the app, and generates  for you.
+
+The site goes live at  in about 3–5 minutes. The free plan sleeps after 15 minutes without visitors, so the first visit after that takes about a minute. Its disk is temporary: stored data resets on each deploy or restart, and the demo user is re-created automatically.
+
 ---
 
 ## 5-minute demo

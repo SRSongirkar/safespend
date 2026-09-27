@@ -1,0 +1,18 @@
+# Render blueprint: one Node web service. Render generates APP_SECRET on first deploy.
+# Note: the free plan's disk is temporary — stored data resets on each deploy/restart,
+# and the demo user (aisha@demo.com / demo1234) is re-created automatically on start.
+services:
+  - type: web
+    name: safespend
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /login
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: APP_SECRET
+        generateValue: true
+      - key: NEXT_TELEMETRY_DISABLED
+        value: 1
