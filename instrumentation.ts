@@ -3,7 +3,12 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     const { getConfig } = await import('./lib/server/config');
-    getConfig();
+    try {
+      getConfig();
+    } catch (e) {
+      console.error(`\n[committed] ${(e as Error).message}\n`);
+      process.exit(1);
+    }
     const { seedDemoIfEmpty } = await import('./lib/server/services/demo');
     if (await seedDemoIfEmpty()) console.log('[committed] Created demo user aisha@demo.com / demo1234 with demo data.');
   }
