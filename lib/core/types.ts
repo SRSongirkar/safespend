@@ -320,6 +320,7 @@ export interface AnalysisResult {
   cardBills: CardBillInfo[];
   insights: Insight[];
   accounts: AccountSummary[];
+  historyDays: number; // days of transaction history available (new users have few)
   refs: EvidenceRefs;
   tookMs: number;
 }

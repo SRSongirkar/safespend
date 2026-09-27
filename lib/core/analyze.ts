@@ -8,7 +8,7 @@ import { normaliseMerchant } from './merchants';
 import { formatCentsExact } from './money';
 import { parseReceipt, type ParsedReceipt } from './receipts';
 import { dayOfMonthFor, detectRecurring, occurrences } from './recurring';
-import { everydayDailyByAccount } from './spending';
+import { everydayDailyByAccount, historyDays } from './spending';
 import { matchTransfers } from './transfers';
 import type {
   Account,
@@ -374,6 +374,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
     cardBills,
     insights,
     accounts: accountSummaries,
+    historyDays: historyDays(txs, asOf),
     refs,
     tookMs: 0,
   };

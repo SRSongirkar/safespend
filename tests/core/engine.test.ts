@@ -3,6 +3,7 @@ import { buildForecast, lowestOf } from '@/lib/core/forecast';
 import { monthlySummaries } from '@/lib/core/monthly';
 import { findAmount, findRenewalDate, parseEmailText } from '@/lib/core/receipts';
 import { amountProfile, detectRecurring } from '@/lib/core/recurring';
+import { everydayDailyByAccount } from '@/lib/core/spending';
 import { matchTransfers } from '@/lib/core/transfers';
 import type { Account, EnrichedTransaction } from '@/lib/core/types';
 
@@ -95,6 +96,17 @@ describe('forecast', () => {
     );
     expect(days[1]).toMatchObject({ low: 10000 - 30000 - 1000, balance: 10000 - 30000 - 1000 + 50000 });
     expect(lowestOf(days)).toEqual({ date: '2026-09-25', amount: -21000 });
+  });
+});
+
+describe('everyday estimate', () => {
+  it('averages over the days of history a new user actually has (at least 7), not always 90', () => {
+    const txs = [tx('a', 'k', '2026-09-25', -70000, 'X'), tx('b', 'k', '2026-09-27', -70000, 'Y')];
+    // 3 days of history → divided by the 7-day minimum, not by 90
+    expect(everydayDailyByAccount(txs, '2026-09-27', new Set()).get('k')).toBe(20000);
+    const longer = [...txs, tx('c', 'k', '2026-01-01', -100, 'Z')];
+    // a long history → the normal 90-day window (the January row is outside the window)
+    expect(everydayDailyByAccount(longer, '2026-09-27', new Set()).get('k')).toBe(Math.round(140000 / 90));
   });
 });
 

@@ -154,6 +154,26 @@ export default function HomePage() {
         </div>
       </header>
 
+      {a.historyDays < 60 || !a.nextPayday ? (
+        <div className="alert alert-info" role="note">
+          <Icon name="info" size={16} />
+          <div className="spacer">
+            <strong>
+              {a.historyDays < 60
+                ? `You have uploaded only ${a.historyDays} day${a.historyDays === 1 ? '' : 's'} of payments, so these numbers are a rough guide.`
+                : 'We could not find your salary yet, so these numbers are a rough guide.'}
+            </strong>
+            <div className="small muted">
+              Upload 2–3 months of bank and credit card statements{!a.nextPayday ? ' and a salary slip' : ''}. Then SafeSpend can find your salary and regular bills
+              like rent, and plan until your next payday.
+            </div>
+          </div>
+          <Link href="/import" className="btn btn-sm">
+            <Icon name="upload" size={14} /> Upload more
+          </Link>
+        </div>
+      ) : null}
+
       <HeadlineNumbers a={a} horizon={horizon} onHorizon={setHorizon} />
 
       <div className="home-grid">

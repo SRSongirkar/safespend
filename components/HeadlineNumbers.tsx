@@ -23,7 +23,7 @@ export default function HeadlineNumbers({ a, horizon, onHorizon }: { a: Analysis
       <section className="card stat" aria-labelledby="committed-label">
         <div className="stat-top">
           <h2 id="committed-label" className="stat-label">
-            Bills to pay before payday
+            {a.nextPayday ? 'Bills to pay before payday' : 'Bills to pay soon'}
           </h2>
           <div className="seg" role="group" aria-label="Time period">
             <button type="button" aria-pressed={horizon === 'payday'} onClick={() => onHorizon('payday')}>
