@@ -131,6 +131,31 @@ describe('S10 delete account', () => {
   });
 });
 
+describe('hardening', () => {
+  it('a corrupted vault gives a clear JSON error, not a crash', async () => {
+    const cookie = await signupUser('h@x.com');
+    await newAccount(cookie);
+    const user = listUsers()[0];
+    fs.writeFileSync(path.join(dataDir, 'vault', `${user.id}.enc`), '{"v":1,"data":"bm90IHJlYWwgY2lwaGVydGV4dA=="}');
+    const r = await call(analysisGET, { cookie });
+    expect(r.status).toBe(500);
+    expect(r.body.error).toMatch(/could not be decrypted/);
+  });
+
+  it('header-only CSV and invalid JSON bodies are handled', async () => {
+    const cookie = await signupUser('i@x.com');
+    const chk = await newAccount(cookie);
+    const headerOnly = await call(previewPOST, { body: { fileName: 'h.csv', text: 'Date,Description,Debit,Credit,Balance\n', accountId: chk }, cookie });
+    expect(headerOnly.status).toBe(200);
+    expect(headerOnly.body).toMatchObject({ rows: 0, added: 0 });
+    expect(headerOnly.body.errors[0]).toMatch(/no transactions/);
+    const req = new Request('http://localhost:3000/api/accounts', { method: 'POST', headers: { host: 'localhost:3000', cookie, 'content-type': 'application/json' }, body: '{not json' });
+    const res = await accountsPOST(req, undefined as never);
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/valid JSON/);
+  });
+});
+
 describe('API smoke', () => {
   it('fresh user → demo/load → analysis matches the golden numbers', async () => {
     const cookie = await signupUser('smoke@x.com');
