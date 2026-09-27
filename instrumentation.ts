@@ -1,0 +1,8 @@
+// Runs once when the Next.js server starts: validate config (refuse to start without APP_SECRET), then seed the demo user.
+export async function register() {
+  if (process.env.NEXT_RUNTIME !== 'nodejs') return;
+  const { getConfig } = await import('./lib/server/config');
+  getConfig();
+  const { seedDemoIfEmpty } = await import('./lib/server/services/demo');
+  if (await seedDemoIfEmpty()) console.log('[committed] Created demo user aisha@demo.com / demo1234 with demo data.');
+}

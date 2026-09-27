@@ -260,6 +260,7 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
               : `Open cycle closing ${formatShortDate(b.cycle.closeDate)}: purchases so far + predicted recurring card charges + an everyday estimate.`,
           },
           includes: b.recurringLabels,
+          card: { accountId: card.id, open: b.cycle.openExclusive, close: b.cycle.closeDate },
         });
       }
     }
@@ -310,10 +311,17 @@ export function analyze(vault: UserVault, opts: { today?: ISODate } = {}): Analy
   const forecast = buildForecast(start, asOf, defaultEnd, toEvents(upcoming), checkingDaily);
   const lowestPoint = lowestOf(forecast);
 
+  // Committed = facts only (no estimates). Card charges count once: inside a card bill due in the window, or on their
+  // own if their bill falls after the window (they're still money already promised).
   const committed = (until: ISODate): CommittedTotals => {
     const out: CommittedTotals = { until, total: 0, byType: {}, items: [] };
-    for (const i of upcoming) {
-      if (i.date <= asOf || i.date > until || i.amount >= 0 || !isForecastItem(i)) continue;
+    const inWindow = upcoming.filter((i) => i.date > asOf && i.date <= until && i.amount < 0);
+    const billsInWindow = inWindow.filter((i) => i.type === 'card_bill' && i.card && isForecastItem(i));
+    for (const i of inWindow) {
+      if (i.viaCard) {
+        const covered = billsInWindow.some((b) => b.card!.accountId === i.accountId && i.date > b.card!.open && i.date <= b.card!.close);
+        if (covered) continue;
+      } else if (!isForecastItem(i)) continue;
       const v = -i.amount - (i.estimatePart ?? 0);
       out.total += v;
       out.byType[i.type] = (out.byType[i.type] ?? 0) + v;

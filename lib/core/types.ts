@@ -198,6 +198,7 @@ export interface UpcomingItem {
   breakdown?: { label: string; amount: Cents; estimate?: boolean }[];
   estimatePart?: Cents; // card bills: the part of `amount` that is an everyday estimate (not committed)
   includes?: { label: string; amount: Cents; date: ISODate }[]; // card bills: predicted recurring card charges
+  card?: { accountId: string; open: ISODate; close: ISODate }; // card bills: which card and cycle (open exclusive, close inclusive)
 }
 
 export interface ForecastEvent {
