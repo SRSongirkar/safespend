@@ -51,7 +51,7 @@ The demo user and its data are created automatically on first start if there are
 
 Amounts are in Indian rupees (₹). The demo data is generated at an Indian scale (salary ₹1,21,250 a month).
 
-1. **Sign in** as . It's Thursday 24 Sep, and her bank shows **₹1,26,386**.
+1. **Sign in** as `aisha@demo.com`. It's Thursday 24 Sep, and her bank shows **₹1,26,386**.
 2. **The truth:** **₹88,114 of bills to pay before payday** (30 Sep). Almost all of it is the credit card bill due 28 Sep, which her bank balance doesn't show yet. Her **lowest balance is ₹24,995 on 30 Oct**, just before the next salary, so she is **safe to spend ₹12,495** and still keep her ₹12,500 minimum balance.
 3. **Decide:** in *Can I buy this?*, try **₹15,000 on 2 Oct → Yes, but money will be tight**. **₹7,500 → Yes, you can buy it**. **₹50,000 → Only if you use savings**, with the amount to move from savings.
 4. **Trust:** click the blue text on any upcoming payment. Rent was paid 13 times before. The HomeShield renewal on 3 Oct was found in an email, not in any statement. The card bill lists every purchase. *Things you should know* shows Spotify's price rise and that Hulu stopped.
@@ -60,7 +60,7 @@ Amounts are in Indian rupees (₹). The demo data is generated at an Indian scal
 7. **Correct:** in the ⋯ menu on Netflix, choose **I cancelled this**. The total drops, and an Undo toast appears.
 8. **Multi-user:** sign up a new user. The account is empty, with none of Aisha's data.
 
-A client presentation with screenshots is in  (outside this repo).
+A client presentation with screenshots is in `C:\Hackthon\presentation\Committed_Client_Presentation.pptx` (outside this repo).
 
 ---
 
