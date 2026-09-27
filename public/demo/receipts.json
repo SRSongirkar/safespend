@@ -1,0 +1,32 @@
+[
+  {
+    "from": "HomeShield Insurance <billing@homeshield.example>",
+    "subject": "Your renters insurance renewal",
+    "date": "2026-09-10",
+    "body": "Hi Aisha, your renters insurance policy renews on October 3, 2026. Amount: $186.00. It will be charged to your checking account on file."
+  },
+  {
+    "from": "Netflix <info@account.netflix.example>",
+    "subject": "Your Netflix receipt",
+    "date": "2026-09-12",
+    "body": "Thanks for your payment of $15.49 for your Standard plan. Next billing date: October 12, 2026."
+  },
+  {
+    "from": "Spotify <no-reply@spotify.example>",
+    "subject": "An update to your Premium price",
+    "date": "2026-07-05",
+    "body": "Your Premium price is changing to $11.99 starting August 2026. You don't need to do anything."
+  },
+  {
+    "from": "Parcel Tracker <track@parcels.example>",
+    "subject": "Your package has shipped",
+    "date": "2026-09-15",
+    "body": "Good news! Your order is on its way and should arrive in 2-3 business days."
+  },
+  {
+    "from": "Design Weekly <news@designweekly.example>",
+    "subject": "This week in design",
+    "date": "2026-09-20",
+    "body": "The best new typefaces of the month, a deep dive into colour systems, and more."
+  }
+]

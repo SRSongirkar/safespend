@@ -1,0 +1,27 @@
+{
+  "accounts": [
+    {
+      "id": "chk",
+      "name": "Everyday Checking",
+      "type": "checking"
+    },
+    {
+      "id": "sav",
+      "name": "Savings",
+      "type": "savings",
+      "openingBalance": "6000.00"
+    },
+    {
+      "id": "card",
+      "name": "Rewards Card",
+      "type": "card",
+      "statementCloseDay": 8,
+      "dueDay": 28,
+      "autopayFrom": "chk"
+    }
+  ],
+  "settings": {
+    "currency": "USD",
+    "buffer": "500.00"
+  }
+}
