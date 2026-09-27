@@ -62,6 +62,23 @@ export const MERCHANT_ALIASES: MerchantAlias[] = [
   // income
   { pattern: 'ACME DESIGN', name: 'Acme Design Co', category: 'income' },
   { pattern: 'INTEREST', name: 'Interest', category: 'income' },
+  // common Indian merchants (UPI descriptions)
+  { pattern: 'SWIGGY', name: 'Swiggy', category: 'dining' },
+  { pattern: 'ZOMATO', name: 'Zomato', category: 'dining' },
+  { pattern: 'CAFE COFFEE DAY', name: 'Cafe Coffee Day', category: 'dining' },
+  { pattern: 'BIGBASKET', name: 'BigBasket', category: 'groceries' },
+  { pattern: 'BLINKIT', name: 'Blinkit', category: 'groceries' },
+  { pattern: 'ZEPTO', name: 'Zepto', category: 'groceries' },
+  { pattern: 'OLA', name: 'Ola', category: 'transport' },
+  { pattern: 'RAPIDO', name: 'Rapido', category: 'transport' },
+  { pattern: 'HP PETROL', name: 'HP Petrol', category: 'transport' },
+  { pattern: 'INDIAN OIL', name: 'Indian Oil', category: 'transport' },
+  { pattern: 'AIRTEL', name: 'Airtel', category: 'phone & internet' },
+  { pattern: 'JIO', name: 'Jio', category: 'phone & internet' },
+  { pattern: 'FLIPKART', name: 'Flipkart', category: 'shopping' },
+  { pattern: 'MYNTRA', name: 'Myntra', category: 'shopping' },
+  { pattern: 'HOTSTAR', name: 'Disney+ Hotstar', category: 'subscriptions' },
+  { pattern: 'ACKO', name: 'Acko Insurance', category: 'insurance' },
   // money movement
   { pattern: 'VENMO', name: 'Venmo', category: 'other' },
   { pattern: 'ATM', name: 'ATM Withdrawal', category: 'other' },
