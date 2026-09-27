@@ -45,6 +45,28 @@ The demo user and its data are created automatically on first start if there are
 | `APP_SECRET` | yes | — | At least 32 characters. The server refuses to start without it. It derives the vault encryption key. |
 | `DATA_DIR` | no | `.data` | Where users, sessions and encrypted vaults are stored |
 
+### Google sign-in and Gmail bill import (optional)
+
+With Google keys set, users see **Continue with Google** on the login page and **Import bills from Gmail** on the Upload page. The Gmail import is read-only and runs once per click. It keeps only emails that contain an amount, and the access token is revoked right after, so no long-term access to anyone's mailbox is kept. No extra libraries are used: it talks to Google's OAuth and Gmail APIs directly with `fetch`, using PKCE and a signed, encrypted state cookie.
+
+1. Open <https://console.cloud.google.com> and create a project (for example "SafeSpend").
+2. Go to **APIs & Services → Library**, search for **Gmail API**, and click **Enable**.
+3. Go to **APIs & Services → OAuth consent screen**:
+   - Choose **External** and fill in the app name and support email.
+   - Add the scopes `openid`, `email`, `profile` and `.../auth/gmail.readonly`.
+   - While the app is in **Testing**, add every Google account that will try it under **Test users**.
+4. Go to **APIs & Services → Credentials → Create credentials → OAuth client ID → Web application**.
+5. Under **Authorized redirect URIs**, add every address the app runs on, followed by `/api/auth/google/callback`:
+   - `http://localhost:3000/api/auth/google/callback`
+   - `https://<your-live-address>/api/auth/google/callback`
+6. Put the Client ID and secret in `.env.local` (or in the Render dashboard), then restart:
+   ```
+   GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
+   GOOGLE_CLIENT_SECRET=xxxxxxxx
+   ```
+
+An existing password account is never linked automatically by email. The user signs in with their password and clicks **Settings → Connect Google account**.
+
 ### Deploy (Render, free)
 
 The repo includes a `render.yaml` blueprint.

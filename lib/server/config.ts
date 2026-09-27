@@ -23,3 +23,18 @@ export function getConfig(): AppConfig {
     isProd: process.env.NODE_ENV === 'production',
   };
 }
+
+export interface GoogleConfig {
+  clientId: string;
+  clientSecret: string;
+  appUrl?: string; // optional fixed public base URL, e.g. https://safespend.onrender.com
+}
+
+/** Google sign-in + Gmail import are optional: enabled only when both credentials are set. */
+export function getGoogleConfig(): GoogleConfig | null {
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
+  if (!clientId || !clientSecret) return null;
+  const appUrl = process.env.APP_URL?.trim().replace(/\/+$/, '') || undefined;
+  return { clientId, clientSecret, appUrl };
+}

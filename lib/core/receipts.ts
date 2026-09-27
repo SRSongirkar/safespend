@@ -5,11 +5,12 @@ import type { Cents, ISODate, Receipt } from './types';
 
 // Regex-only receipt/renewal email parsing (no AI).
 
-const AMOUNT = /(?:\$|₹|\bRs\.?|\bINR)\s?([\d,]+\.\d{2})/i;
-const RENEWAL_KEYWORD = /(renews on|renewal|will be charged|next billing date)/gi;
+// "$186.00", "₹4,650.00", "Rs. 1,200", "INR 899" (Indian bills often have no paise)
+const AMOUNT = /(?:\$|₹|\bRs\.?|\bINR)\s?(\d[\d,]*(?:\.\d{2})?)(?![\d,])/i;
+const RENEWAL_KEYWORD = /(renews on|renewal|will be charged|next billing date|due date|due on|payment due|pay by|last date)/gi;
 const DATE_PATTERNS: { re: RegExp; build: (m: RegExpExecArray) => ISODate | null }[] = [
   { re: /\b([A-Z][a-z]{2,8})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b/, build: (m) => mk(+m[3], monthFromName(m[1]), +m[2]) },
-  { re: /\b(\d{1,2})(?:st|nd|rd|th)?\s+([A-Z][a-z]{2,8})\.?,?\s+(\d{4})\b/, build: (m) => mk(+m[3], monthFromName(m[2]), +m[1]) },
+  { re: /\b(\d{1,2})(?:st|nd|rd|th)?[\s-]+([A-Z][a-z]{2,8})\.?,?[\s-]+(\d{4})\b/, build: (m) => mk(+m[3], monthFromName(m[2]), +m[1]) },
   { re: /\b(\d{4})-(\d{2})-(\d{2})\b/, build: (m) => mk(+m[1], +m[2], +m[3]) },
 ];
 

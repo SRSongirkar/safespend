@@ -8,6 +8,8 @@ import { LoadingBlock } from '@/components/Spinner';
 import { useToast } from '@/components/Toast';
 import { applyTheme, readTheme } from '@/components/UserMenu';
 import type { Settings } from '@/lib/core/types';
+import type { PublicUser } from '@/lib/client/api';
+import { googleErrorMessage } from '@/lib/client/googleMessages';
 import { settingsApi } from '@/lib/client/api';
 import { currencySymbol, formatDateYear, parseMoneyInput } from '@/lib/client/format';
 import { useApi } from '@/lib/client/useApi';
@@ -17,6 +19,15 @@ const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'CAD', 'AUD', 'NZD', 'SGD', 'JPY
 export default function SettingsPage() {
   const toast = useToast();
   const { data, error, initialLoading, reload, setData } = useApi<{ settings: Settings }>('/api/settings');
+  const me = useApi<{ user: PublicUser; googleEnabled: boolean }>('/api/auth/me');
+  const hasPassword = me.data?.user.hasPassword !== false;
+  const [googleNote, setGoogleNote] = useState<{ ok: boolean; text: string } | null>(null);
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('google') === 'linked') setGoogleNote({ ok: true, text: 'Google account connected. You can now sign in with Google.' });
+    else if (p.get('error')) setGoogleNote({ ok: false, text: googleErrorMessage(p.get('error')) ?? '' });
+    if (p.has('google') || p.has('error')) window.history.replaceState(null, '', window.location.pathname);
+  }, []);
   const [currency, setCurrency] = useState('INR');
   const [buffer, setBuffer] = useState('');
   const [asOf, setAsOf] = useState('');
@@ -64,6 +75,7 @@ export default function SettingsPage() {
     setPwBusy(true);
     try {
       await settingsApi.changePassword(pw.current, pw.next);
+      me.reload();
       setPw({ current: '', next: '', confirm: '' });
       toast({ message: 'Password changed. Other devices have been signed out.' });
     } catch (err) {
@@ -179,19 +191,50 @@ export default function SettingsPage() {
             </div>
           </section>
 
+          <section className="card stack" aria-labelledby="google-title">
+            <div>
+              <h2 id="google-title" className="card-title">
+                Google account
+              </h2>
+              <p className="card-sub">Sign in with Google, and import bills from Gmail on the Upload page.</p>
+            </div>
+            {me.data?.user.google ? (
+              <div className="alert alert-good">
+                <Icon name="check" size={16} />
+                <span>Connected. You can sign in with Google.</span>
+              </div>
+            ) : me.data?.googleEnabled ? (
+              <div>
+                <a className="btn" href="/api/auth/google/start?mode=link">
+                  Connect Google account
+                </a>
+              </div>
+            ) : (
+              <p className="small muted">Google sign-in is not set up on this server yet.</p>
+            )}
+            {googleNote ? (
+              <div className={`alert ${googleNote.ok ? 'alert-good' : 'alert-error'}`} role="status">
+                <Icon name={googleNote.ok ? 'check' : 'alert'} size={16} />
+                <span>{googleNote.text}</span>
+              </div>
+            ) : null}
+          </section>
+
           <form className="card stack" onSubmit={changePassword} aria-labelledby="pw-title">
             <div>
               <h2 id="pw-title" className="card-title">
-                Change password
+                {hasPassword ? 'Change password' : 'Set a password'}
               </h2>
-              <p className="card-sub">You will be signed out on other devices.</p>
+              <p className="card-sub">{hasPassword ? 'You will be signed out on other devices.' : 'Optional: lets you also sign in with your email and a password.'}</p>
             </div>
-            <div className="field">
-              <label className="label" htmlFor="pw-current">
-                Current password
-              </label>
-              <input id="pw-current" className="input" type="password" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} />
-            </div>
+            {hasPassword ? (
+              <div className="field">
+                <label className="label" htmlFor="pw-current">
+                  Current password
+                </label>
+                <input id="pw-current" className="input" type="password" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} />
+              </div>
+            ) : null}
             <div className="form-grid">
               <div className="field">
                 <label className="label" htmlFor="pw-next">
@@ -212,9 +255,9 @@ export default function SettingsPage() {
               </div>
             ) : null}
             <div className="row" style={{ justifyContent: 'flex-end' }}>
-              <button type="submit" className="btn" disabled={pwBusy || !pw.current || !pw.next}>
+              <button type="submit" className="btn" disabled={pwBusy || (hasPassword && !pw.current) || !pw.next}>
                 {pwBusy ? <span className="spinner" /> : null}
-                Change password
+                {hasPassword ? 'Change password' : 'Set password'}
               </button>
             </div>
           </form>
@@ -269,13 +312,13 @@ export default function SettingsPage() {
             </>
           }
         >
-          <p className="muted small">You cannot undo this. You may want to download your data first. Enter your password to confirm.</p>
+          <p className="muted small">You cannot undo this. You may want to download your data first. {hasPassword ? 'Enter your password to confirm.' : 'Type DELETE to confirm.'}</p>
           <input
             className="input"
-            type="password"
-            autoComplete="current-password"
-            aria-label="Password"
-            placeholder="Your password"
+            type={hasPassword ? 'password' : 'text'}
+            autoComplete={hasPassword ? 'current-password' : 'off'}
+            aria-label={hasPassword ? 'Password' : 'Type DELETE'}
+            placeholder={hasPassword ? 'Your password' : 'DELETE'}
             value={deletePw}
             onChange={(e) => setDeletePw(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && deletePw && void deleteAccount()}

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export const POST = route(async (req) => {
   const user = requireUser(req);
   const body = await readJson(req);
-  const currentPassword = str(body, 'currentPassword', { max: 200, trim: false })!;
+  const currentPassword = str(body, 'currentPassword', { max: 200, trim: false, optional: true }) ?? '';
   const newPassword = str(body, 'newPassword', { max: 200, trim: false })!;
   await changePassword(user.id, sessionToken(req), currentPassword, newPassword);
   return json({ ok: true });

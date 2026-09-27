@@ -16,3 +16,10 @@ services:
         generateValue: true
       - key: NEXT_TELEMETRY_DISABLED
         value: 1
+      # Optional Google sign-in + Gmail import: paste your values in the Render dashboard
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: APP_URL
+        sync: false

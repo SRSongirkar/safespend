@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import { hashPassword, hashToken, newToken, verifyPassword } from './crypto';
+import type { GoogleProfile } from './google';
 import { HttpError } from './http';
 import { deleteVault, findSession, findUserByEmail, findUserById, listSessions, mutateSessions, mutateUsers, type UserRecord } from './repo';
 
@@ -13,9 +14,11 @@ export interface PublicUser {
   id: string;
   name: string;
   email: string;
+  hasPassword: boolean;
+  google: boolean;
 }
 
-const toPublic = (u: UserRecord): PublicUser => ({ id: u.id, name: u.name, email: u.email });
+const toPublic = (u: UserRecord): PublicUser => ({ id: u.id, name: u.name, email: u.email, hasPassword: !!u.passwordHash, google: !!u.googleSub });
 
 export function normaliseEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -137,7 +140,8 @@ export function requireUser(req: Request): PublicUser {
 export async function changePassword(userId: string, currentToken: string | undefined, currentPassword: string, newPassword: string) {
   const user = findUserById(userId);
   if (!user) throw new HttpError(401, 'Please sign in');
-  if (!(await verifyPassword(currentPassword, user.passwordHash, user.salt))) throw new HttpError(400, 'Your current password is incorrect');
+  // Google-only accounts have no password yet: they can set one without a current password.
+  if (user.passwordHash && !(await verifyPassword(currentPassword, user.passwordHash, user.salt))) throw new HttpError(400, 'Your current password is incorrect');
   validateCredentials({ email: user.email, password: newPassword }, false);
   const { hash, salt } = await hashPassword(newPassword);
   await mutateUsers((users) => {
@@ -151,12 +155,51 @@ export async function changePassword(userId: string, currentToken: string | unde
 export async function deleteAccount(userId: string, password: string) {
   const user = findUserById(userId);
   if (!user) throw new HttpError(401, 'Please sign in');
-  if (!(await verifyPassword(password, user.passwordHash, user.salt))) throw new HttpError(400, 'Password is incorrect');
+  if (user.passwordHash) {
+    if (!(await verifyPassword(password, user.passwordHash, user.salt))) throw new HttpError(400, 'Password is incorrect');
+  } else if (password !== 'DELETE') {
+    throw new HttpError(400, 'Type DELETE to confirm');
+  }
   await deleteVault(userId);
   await mutateSessions((sessions) => sessions.filter((s) => s.userId !== userId));
   await mutateUsers((users) => {
     const idx = users.findIndex((u) => u.id === userId);
     if (idx >= 0) users.splice(idx, 1);
+  });
+}
+
+// ---------- Google sign-in ----------
+
+/**
+ * Sign in with Google: an existing Google-linked user signs in; a new email gets a new account. An existing
+ * password account is never auto-linked (signup doesn't verify email ownership) — the user links it in Settings.
+ */
+export async function loginWithGoogle(p: GoogleProfile): Promise<{ user: PublicUser; token: string }> {
+  if (!p.emailVerified) throw new HttpError(403, 'google_unverified');
+  const user = await mutateUsers((users) => {
+    const bySub = users.find((u) => u.googleSub === p.sub);
+    if (bySub) return bySub;
+    const byEmail = users.find((u) => u.email === p.email);
+    if (byEmail) {
+      if (byEmail.passwordHash || byEmail.googleSub) throw new HttpError(409, 'google_exists');
+      byEmail.googleSub = p.sub;
+      return byEmail;
+    }
+    const record: UserRecord = { id: randomUUID(), email: p.email, name: p.name, passwordHash: '', salt: '', createdAt: new Date().toISOString(), googleSub: p.sub };
+    users.push(record);
+    return record;
+  });
+  return { user: toPublic(user), token: await createSession(user.id) };
+}
+
+/** Link a Google account to the signed-in user, so they can sign in with Google next time. */
+export async function linkGoogle(userId: string, p: GoogleProfile): Promise<void> {
+  if (!p.emailVerified) throw new HttpError(403, 'google_unverified');
+  await mutateUsers((users) => {
+    if (users.some((u) => u.googleSub === p.sub && u.id !== userId)) throw new HttpError(409, 'google_in_use');
+    const u = users.find((x) => x.id === userId);
+    if (!u) throw new HttpError(401, 'Please sign in');
+    u.googleSub = p.sub;
   });
 }
 

@@ -24,6 +24,8 @@ export interface PublicUser {
   id: string;
   name: string;
   email: string;
+  hasPassword?: boolean;
+  google?: boolean;
 }
 
 export async function api<T>(path: string, opts: { method?: string; body?: unknown; signal?: AbortSignal } = {}): Promise<T> {
@@ -64,6 +66,7 @@ export const authApi = {
   login: (email: string, password: string) => api<{ user: PublicUser }>('/api/auth/login', { body: { email, password } }),
   signup: (name: string, email: string, password: string) => api<{ user: PublicUser }>('/api/auth/signup', { body: { name, email, password } }),
   logout: () => api<{ ok: true }>('/api/auth/logout', { method: 'POST' }),
+  me: () => api<{ user: PublicUser; googleEnabled: boolean }>('/api/auth/me'),
 };
 
 export const analysisApi = {

@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { ConfirmDialog } from '@/components/Dialog';
 import Icon from '@/components/Icon';
 import ImportHistory from '@/components/ImportHistory';
+import GmailImport from '@/components/GmailImport';
 import ImportWizard from '@/components/ImportWizard';
 import { LoadingBlock } from '@/components/Spinner';
 import { useToast } from '@/components/Toast';
 import type { Account, ImportRecord, Settings } from '@/lib/core/types';
+import type { PublicUser } from '@/lib/client/api';
 import { importApi } from '@/lib/client/api';
 import { plural } from '@/lib/client/format';
 import { useApi } from '@/lib/client/useApi';
@@ -17,6 +19,7 @@ export default function ImportPage() {
   const accounts = useApi<{ accounts: Account[] }>('/api/accounts');
   const imports = useApi<{ imports: ImportRecord[] }>('/api/imports');
   const settings = useApi<{ settings: Settings }>('/api/settings');
+  const me = useApi<{ user: PublicUser; googleEnabled: boolean }>('/api/auth/me');
   const [undoing, setUndoing] = useState<ImportRecord | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -54,6 +57,8 @@ export default function ImportPage() {
           </div>
         </div>
       </div>
+
+      <GmailImport enabled={!!me.data?.googleEnabled} onDone={imports.reload} />
 
       {accounts.initialLoading ? (
         <LoadingBlock />

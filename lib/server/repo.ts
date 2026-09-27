@@ -12,9 +12,10 @@ export interface UserRecord {
   id: string;
   email: string;
   name: string;
-  passwordHash: string;
+  passwordHash: string; // '' for accounts created with Google sign-in
   salt: string;
   createdAt: string;
+  googleSub?: string; // Google account id, when the user signs in with Google
 }
 
 export interface SessionRecord {
