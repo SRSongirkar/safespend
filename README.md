@@ -47,13 +47,13 @@ The demo user and its data are created automatically on first start if there are
 
 ### Deploy (Render, free)
 
-The repo includes a  blueprint.
+The repo includes a `render.yaml` blueprint.
 
 1. Sign in at <https://render.com> with GitHub.
-2. Click **New → Blueprint** and pick the  repo.
-3. Click **Apply**. Render builds and starts the app, and generates  for you.
+2. Click **New → Blueprint** and pick the `safespend` repo.
+3. Click **Apply**. Render builds and starts the app, and generates `APP_SECRET` for you.
 
-The site goes live at  in about 3–5 minutes. The free plan sleeps after 15 minutes without visitors, so the first visit after that takes about a minute. Its disk is temporary: stored data resets on each deploy or restart, and the demo user is re-created automatically.
+The site goes live at `https://safespend-xxxx.onrender.com` in about 3–5 minutes. The free plan sleeps after 15 minutes without visitors, so the first visit after that takes about a minute. Its disk is temporary: stored data resets on each deploy or restart, and the demo user is re-created automatically.
 
 ---
 
